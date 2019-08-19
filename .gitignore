@@ -71,3 +71,6 @@
 
 # Personal notes
 *.perso.md
+
+# Environment variables
+.env*

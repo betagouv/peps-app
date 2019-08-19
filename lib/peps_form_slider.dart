@@ -1,97 +1,117 @@
-import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:app/form/fields/radio.dart';
+import 'package:app/form/fields/checkbox.dart';
+import 'package:app/results.dart';
+import 'package:app/form/fields/base_field.dart';
 
 class PepsFormSlider extends StatelessWidget {
-  final String str;
+  final Map properties;
+  final Map options;
+  final PageController pageController;
+  final List<Field> fields;
 
-  PepsFormSlider({this.str});
+  PepsFormSlider({this.properties, this.options}) :
+    pageController = PageController(initialPage: 0),
+    fields = PepsFormSlider.createFields(properties, options);
 
-  List<Widget> _getChildren() {
-    final jsonBody = jsonDecode(this.str);
-    final jsonProperties = jsonBody['schema']['properties'];
-    final jsonOptions = jsonBody['options']['fields'];
+  static List<Field> createFields(Map properties, Map options) {
+    List<Field> fields = [];
 
+    for (var key in properties.keys) {
+      if (options[key]['type'] == 'radio') {
+        fields.add(RadioField(fieldKey: key, schema: properties[key], options: options[key]));
+      } else if (options[key]['type'] == 'checkbox') {
+        fields.add(CheckboxField(fieldKey: key, schema: properties[key], options: options[key]));
+      }
+    }
+    return fields;
+  }
+
+  List<Widget> _getChildren(BuildContext context) {
     List<Widget> children = [];
 
-    for (var key in jsonProperties.keys) {
-      // TODO: check for options[key] not being there (it's optional)
-      children.add(FormFieldCard(
-          schema: jsonProperties[key], options: jsonOptions[key]));
+    for (var field in this.fields) {
+      var isLast = this.fields.last == field;
+      var nextCallback = isLast
+          ? () => goToSuggestions(context)
+          : () => pageController.nextPage(
+              duration: Duration(milliseconds: 200), curve: Curves.ease);
+      var previousCallback = () => pageController.previousPage(
+          duration: Duration(milliseconds: 200), curve: Curves.ease);
+
+      children.add(_FormFieldCard(
+        field: field,
+        nextCallback: nextCallback,
+        previousCallback: previousCallback,
+      ));
     }
 
     return children;
   }
 
+  void goToSuggestions(BuildContext context) {
+    Map formResults = {};
+    for (var field in this.fields) {
+      formResults.addAll(field.getJsonValue());
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => Results(formResults: formResults,)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageView(
-      controller: PageController(
-        initialPage: 0,
-      ),
-      children: _getChildren(),
+      controller: pageController,
+      children: _getChildren(context),
     );
   }
 }
 
-class FormFieldCard extends StatelessWidget {
-  final Map schema;
-  final Map options;
+class _FormFieldCard extends StatelessWidget {
+  final Field field;
+  final Function nextCallback;
+  final Function previousCallback;
 
-  FormFieldCard({this.schema, this.options});
+  _FormFieldCard({this.field, this.nextCallback, this.previousCallback});
 
   @override
   Widget build(BuildContext context) {
-    Widget field = Text('Schema\n\n' +
-        JsonEncoder.withIndent("  ").convert(this.schema) +
-        '\n\nOptions:\n\n' +
-        JsonEncoder.withIndent("  ").convert(this.options));
-
-    if (this.options['type'] == 'radio') {
-      field = RadioField(schema: this.schema, options: this.options);
-    }
 
     return ListView(
-        padding: const EdgeInsets.all(10.0),
-        children: <Widget>[
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(10.0),
-              child: field,
+      padding: EdgeInsets.all(10.0),
+      children: <Widget>[
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: this.field,
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: FloatingActionButton(
+                    onPressed: previousCallback,
+                    child: Icon(Icons.arrow_left),
+                    heroTag: 'btnP',
+                  ),
+                ),
+                Expanded(
+                  child: FloatingActionButton(
+                    onPressed: nextCallback,
+                    child: Icon(Icons.arrow_right),
+                    heroTag: 'btnN',
+                  ),
+                ),
+              ],
             ),
-          )
-        ],
+          ),
+        )
+      ],
     );
   }
 }
-
-abstract class Field extends StatelessWidget {
-  final Map schema;
-  final Map options;
-
-  String get title =>
-      this.schema.containsKey('title') ? this.schema['title'] : '';
-
-  Field({this.schema, this.options});
-}
-
-class RadioField extends Field {
-  RadioField({Map schema, Map options})
-      : super(schema: schema, options: options);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(this.title +
-        '\n\n' +
-        'Schema\n\n' +
-        JsonEncoder.withIndent("  ").convert(this.schema) +
-        '\n\nOptions:\n\n' +
-        JsonEncoder.withIndent("  ").convert(this.options));
-  }
-}
-
-class CheckboxField extends FormFieldCard {}
-
-class SelectField extends FormFieldCard {}
-
-class ArrayField extends FormFieldCard {}
