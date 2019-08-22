@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/radio.dart';
 import 'package:app/form/fields/checkbox.dart';
+import 'package:app/form/fields/array.dart';
 import 'package:app/results.dart';
 import 'package:app/form/fields/base_field.dart';
 
@@ -23,7 +24,10 @@ class PepsFormSlider extends StatelessWidget {
         fields.add(RadioField(fieldKey: key, schema: properties[key], options: options[key]));
       } else if (options[key]['type'] == 'checkbox') {
         fields.add(CheckboxField(fieldKey: key, schema: properties[key], options: options[key]));
+      } else if (options[key]['type'] == 'array') {
+        fields.add(ArrayField(fieldKey: key, schema: properties[key], options: options[key]));
       }
+
     }
     return fields;
   }
