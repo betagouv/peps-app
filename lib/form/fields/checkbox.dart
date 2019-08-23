@@ -27,7 +27,6 @@ class _CheckboxFieldState extends State<CheckboxField> {
   void toggleValue(String value, bool toggle) {
     setState(() {
       toggle ? _selected.add(value) : _selected.remove(value);
-      print(_selected);
     });
   }
 

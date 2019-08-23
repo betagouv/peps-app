@@ -1,9 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
 
+/// The array field allows choosing an ordered list of
+/// elements from options (implements Alpaca's array field
+/// http://www.alpacajs.org/docs/fields/array.html).
 class ArrayField extends Field {
   _ArrayFieldState _state;
 
@@ -25,8 +26,14 @@ class ArrayField extends Field {
 class _ArrayFieldState extends State<ArrayField> {
   List<Map> _selected = List<Map>();
 
+  /// Allows is to swap places in the state array to move
+  /// items up and down. If we specify out-of-bounds positions
+  /// the function will just ignore the request.
   void swap(int index1, int index2) {
-    if (index1 < 0 || index2 < 0 || index1 >= _selected.length || index2 >= _selected.length) {
+    if (index1 < 0 ||
+        index2 < 0 ||
+        index1 >= _selected.length ||
+        index2 >= _selected.length) {
       return;
     }
     var tmp = _selected[index1];
@@ -36,6 +43,8 @@ class _ArrayFieldState extends State<ArrayField> {
     });
   }
 
+  /// Returns the list of items to be displayed in the
+  /// list view.
   List<Widget> getListItems() {
     List<Widget> widgets = List<Widget>();
     for (var i = 0; i < _selected.length; i++) {
@@ -48,6 +57,34 @@ class _ArrayFieldState extends State<ArrayField> {
       ));
     }
     return widgets;
+  }
+
+  /// Will display the fullscreen list view to choose from the
+  /// different options.
+  void showSelectionScreen(BuildContext context) {
+    List<Widget> widgets = List<Widget>();
+    for (var item in widget.options['items']['dataSource']) {
+      widgets.add(
+        ListTile(
+          title: Text(item['text']),
+          onTap: () {
+            setState(() => _selected.add(item));
+            Navigator.of(context).pop();
+          },
+        ),
+      );
+    }
+
+    showBottomSheet(
+        context: context,
+        builder: (context) {
+          return ListView.separated(
+            separatorBuilder: (context, index) => Divider(),
+            itemCount: widgets.length,
+            itemBuilder: (context, index) => widgets[index],
+            shrinkWrap: true,
+          );
+        });
   }
 
   @override
@@ -81,64 +118,64 @@ class _ArrayFieldState extends State<ArrayField> {
             style: TextStyle(color: Colors.white),
           ),
           color: Colors.green,
-          onPressed: () {
-            setState(() {
-              _selected.add(
-                  widget.options['items']['dataSource'][Random().nextInt(5)]);
-            });
-          },
+          onPressed: () => showSelectionScreen(context),
         ),
       ],
     );
   }
 }
 
-
+/// This widget is the list item we display in the list
+/// view. It contains the display text as well as arrows
+/// to move it up and down. It is also swipable to remove
+/// the item from the list.
 class ListItem extends StatelessWidget {
-
   final String text;
   final Function swapUp;
   final Function swapDown;
   final Function onDismissed;
+  final bool showDivider;
 
-
-  ListItem({this.text, this.swapUp, this.swapDown, this.onDismissed});
+  ListItem(
+      {this.text,
+      this.swapUp,
+      this.swapDown,
+      this.onDismissed,
+      this.showDivider});
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-          key: UniqueKey(),
-          background: Container(color: Colors.red),
-          direction: DismissDirection.horizontal,
-          onDismissed: this.onDismissed,
-          child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    child: Text(text),
-                    padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                  ),
-                ),
-                Padding(
-                    child: IconButton(
-                        icon: Icon(Icons.arrow_upward),
-                        onPressed: swapUp
-                      ),
-                    padding: EdgeInsets.fromLTRB(16, 0, 4, 0)),
-                Padding(
-                    child: IconButton(
-                        icon: Icon(Icons.arrow_downward),
-                        onPressed: swapDown
-                    ),
-                    padding: EdgeInsets.fromLTRB(4, 0, 16, 0)),
-              ],
+      key: UniqueKey(),
+      background: Container(color: Colors.red),
+      direction: DismissDirection.horizontal,
+      onDismissed: this.onDismissed,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              child: Text(text),
+              padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
             ),
-          );
+          ),
+          Padding(
+              child:
+                  IconButton(icon: Icon(Icons.arrow_upward), onPressed: swapUp),
+              padding: EdgeInsets.fromLTRB(16, 0, 4, 0)),
+          Padding(
+              child: IconButton(
+                  icon: Icon(Icons.arrow_downward), onPressed: swapDown),
+              padding: EdgeInsets.fromLTRB(4, 0, 16, 0)),
+        ],
+      ),
+    );
   }
-  
 }
 
-// Removes glow in the array list when reaching the edges of the scroll
+/// This ScrollBehavior removes the bounce glow displayed when
+/// we get to the edge of the screen. It is necessary because the list
+/// should not be scrollable, so the display of these glows can confuse
+/// the user.
 class PlainScrollBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
