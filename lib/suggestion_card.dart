@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SuggestionCard extends StatelessWidget {
   final Map json;
@@ -37,6 +38,8 @@ class SuggestionCard extends StatelessWidget {
   }
 }
 
+/// This widget displays quick information in a table. This info is
+/// equipment, schedule, impact, benefits and success factors.
 class SuggestionTable extends StatelessWidget {
   final Map jsonPractice;
 
@@ -73,10 +76,10 @@ class SuggestionTable extends StatelessWidget {
       Padding(
           child: Text(
             header,
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.grey, height: 1.3),
           ),
           padding: EdgeInsets.all(5.0)),
-      Padding(child: Text(body), padding: EdgeInsets.all(5.0)),
+      Padding(child: Text(body, style: TextStyle(height: 1.3)), padding: EdgeInsets.all(3.0)),
     ]);
   }
 
@@ -90,8 +93,18 @@ class SuggestionTable extends StatelessWidget {
   }
 }
 
+/// Collapsable drawer that containe the long text information
+/// about the practice as well as the resource links.
 class SuggestionDrawer extends StatelessWidget {
   final Map json;
+
+  final TextStyle titleStyle = TextStyle(
+    color: Colors.green,
+    fontSize: 18.0,
+    height: 1.5,
+  );
+
+  final TextStyle bodyStyle = TextStyle(height: 1.3);
 
   SuggestionDrawer({this.json});
 
@@ -103,57 +116,107 @@ class SuggestionDrawer extends StatelessWidget {
         style: TextStyle(color: Colors.green),
       ),
       children: <Widget>[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            DetailTitleText('Marge de manoeuvre'),
-            DetailBodyText(json['practice']['mechanism']['description']),
-            DetailTitleText('Fonctionnement'),
-            DetailBodyText(json['practice']['description']),
-            DetailTitleText('En savoir plus'),
-          ],
-        )
+        Padding(
+            padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Marge de manoeuvre',
+                  style: this.titleStyle,
+                ),
+                Text(json['practice']['mechanism']['description'],
+                    style: bodyStyle),
+                Text(
+                  'Fonctionnement',
+                  style: this.titleStyle,
+                ),
+                Text(json['practice']['description'], style: bodyStyle),
+                Text(
+                  'En savoir plus',
+                  style: this.titleStyle,
+                ),
+                Column(
+                  children: json['practice']['secondary_resources']
+                      .map<Widget>((x) => ResourceLink(json: x))
+                      .toList(),
+                )
+              ],
+            ))
       ],
     );
   }
 }
 
-class DetailTitleText extends StatelessWidget {
-  final String content;
+/// Displays a resource (link to a pdf, site or video). Opens
+/// the system's browser when tapped
+class ResourceLink extends StatelessWidget {
+  final Map json;
 
-  DetailTitleText(this.content);
+  ResourceLink({this.json});
+
+  Icon getIcon() {
+    if (this.json['resource_type'] == 'PDF') {
+      return Icon(Icons.picture_as_pdf);
+    }
+    if (this.json['resource_type'] == 'VIDEO') {
+      return Icon(Icons.video_library);
+    }
+    if (this.json['resource_type'] == 'SITE_WEB') {
+      return Icon(Icons.language);
+    }
+    return null;
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      this.content,
-      style: TextStyle(
-        color: Colors.green,
-        fontSize: 18.0,
-        height: 1.5,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
+      child: Material(
+        borderOnForeground: true,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+            side: BorderSide(width: 0.5, color: Colors.grey),
+            borderRadius: BorderRadius.circular(5)),
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => launch(Uri.encodeFull(this.json['url'])),
+          child: Padding(
+              padding: EdgeInsets.all(5),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          child: Row(
+                            children: <Widget>[
+                              Padding(
+                                child: getIcon(),
+                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                              ),
+                              Text(this.json['name']),
+                            ],
+                          ),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                        ),
+                        Text(this.json['description'],
+                            style: TextStyle(color: Colors.grey, height: 1.3)),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_right)
+                ],
+              )),
+        ),
       ),
     );
   }
 }
 
-class DetailBodyText extends StatelessWidget {
-  final String content;
-
-  DetailBodyText(this.content);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-        child: Text(
-          this.content,
-          style: TextStyle(
-            height: 1.3,
-          ),
-        ));
-  }
-}
-
+/// Button row displayed in the bottom of the suggestion
+/// card.
 class ButtonRow extends StatelessWidget {
   final double iconSize = 35.0;
 
@@ -184,7 +247,10 @@ class ButtonRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
             child: RaisedButton(
-              child: Text('Essayer', style: TextStyle(color: Colors.white),),
+              child: Text(
+                'Essayer',
+                style: TextStyle(color: Colors.white),
+              ),
               color: Colors.green,
               onPressed: () => print('pressed'),
             ),
