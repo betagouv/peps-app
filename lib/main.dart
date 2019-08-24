@@ -40,14 +40,21 @@ class _PepsHomePageState extends State<PepsHomePage> {
         ),
         body: Center(
             child: new FutureBuilder(
-                future: http
-                    .get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema')),
+                future: http.get(
+                    new Uri.http(
+                        DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'),
+                    headers: {
+                      'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']
+                    }),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     final jsonBody = jsonDecode(snapshot.data.body);
                     final jsonProperties = jsonBody['schema']['properties'];
                     final jsonOptions = jsonBody['options']['fields'];
-                    return PepsFormSlider(properties: jsonProperties, options: jsonOptions,);
+                    return PepsFormSlider(
+                      properties: jsonProperties,
+                      options: jsonOptions,
+                    );
                   } else {
                     return CircularProgressIndicator();
                   }

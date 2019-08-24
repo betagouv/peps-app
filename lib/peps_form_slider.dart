@@ -27,7 +27,6 @@ class PepsFormSlider extends StatelessWidget {
       } else if (options[key]['type'] == 'array') {
         fields.add(ArrayField(fieldKey: key, schema: properties[key], options: options[key]));
       }
-
     }
     return fields;
   }
