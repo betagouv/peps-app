@@ -11,6 +11,7 @@ class PepsFormSlider extends StatelessWidget {
   final Map options;
   final PageController pageController;
   final List<Field> fields;
+  List<int> fieldStack = [0];
 
   PepsFormSlider({this.properties, this.options}) :
     pageController = PageController(initialPage: 0),
@@ -34,21 +35,43 @@ class PepsFormSlider extends StatelessWidget {
   List<Widget> _getChildren(BuildContext context) {
     List<Widget> children = [];
 
-    for (var field in this.fields) {
-      var isLast = this.fields.last == field;
-      var nextCallback = isLast
-          ? () => goToSuggestions(context)
-          : () => pageController.nextPage(
-              duration: Duration(milliseconds: 200), curve: Curves.ease);
-      var previousCallback = () => pageController.previousPage(
-          duration: Duration(milliseconds: 200), curve: Curves.ease);
+      var nextCallback = () {
+          var nextPage = pageController.page.toInt();
 
-      children.add(_FormFieldCard(
-        field: field,
-        nextCallback: nextCallback,
-        previousCallback: previousCallback,
-      ));
-    }
+          /// We need to find the next page that has its dependencies satisfied
+          /// from the answers provided so far.
+          while (nextPage < fields.length - 1) {
+            nextPage += 1;
+
+            var answers = {};
+            for (var i = 0; i <= pageController.page.toInt(); i++) {
+              answers.addAll(fields[i].getJsonValue());
+            }
+
+            if (fields[nextPage].dependenciesAreMet(answers)) {
+              pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
+              fieldStack.add(nextPage);
+              return;
+            }
+          }
+          /// We reached the end of the pages, we need to go to the suggestions page.
+          goToSuggestions(context);
+        };
+
+      var previousCallback = () {
+        if (fieldStack.length > 1) {
+          fieldStack.removeLast();
+          pageController.animateToPage(fieldStack.last, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        }
+      };
+
+      for (var field in this.fields) {
+        children.add(_FormFieldCard(
+          field: field,
+          nextCallback: nextCallback,
+          previousCallback: previousCallback,
+        ));
+      }
 
     return children;
   }
@@ -66,6 +89,7 @@ class PepsFormSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageView(
+      physics: NeverScrollableScrollPhysics(),
       controller: pageController,
       children: _getChildren(context),
     );
