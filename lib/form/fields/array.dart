@@ -14,17 +14,20 @@ class ArrayField extends Field {
   @override
   _ArrayFieldState createState() {
     _state = _ArrayFieldState();
+    _state._onChanged = this.notifyListeners;
     return _state;
   }
 
   @override
   Map getJsonValue() {
-    return {fieldKey: _state._selected.map((item) => item['value']).join(',')};
+    var isEmpty = _state._selected.length == 0;
+    return {fieldKey: isEmpty ? null : _state._selected.map((item) => item['value']).join(',')};
   }
 }
 
 class _ArrayFieldState extends State<ArrayField> {
   List<Map> _selected = List<Map>();
+  Function _onChanged;
 
   /// Allows is to swap places in the state array to move
   /// items up and down. If we specify out-of-bounds positions
@@ -41,6 +44,7 @@ class _ArrayFieldState extends State<ArrayField> {
       _selected[index1] = _selected[index2];
       _selected[index2] = tmp;
     });
+    _onChanged();
   }
 
   /// Returns the list of items to be displayed in the
@@ -53,7 +57,10 @@ class _ArrayFieldState extends State<ArrayField> {
         text: item['text'],
         swapUp: () => swap(i, i - 1),
         swapDown: () => swap(i, i + 1),
-        onDismissed: (dir) => setState(() => _selected.removeAt(i)),
+        onDismissed: (dir) {
+          setState(() => _selected.removeAt(i));
+          _onChanged();
+        },
       ));
     }
     return widgets;
@@ -68,7 +75,10 @@ class _ArrayFieldState extends State<ArrayField> {
         ListTile(
           title: Text(item['text']),
           onTap: () {
-            setState(() => _selected.add(item));
+            setState(() {
+              _selected.add(item);
+            });
+            _onChanged();
             Navigator.of(context).pop();
           },
         ),
@@ -96,7 +106,7 @@ class _ArrayFieldState extends State<ArrayField> {
         Padding(
           child: Text(
             widget.title,
-            style: TextStyle(fontSize: 30.0),
+            style: widget.titleStyle,
           ),
           padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
         ),

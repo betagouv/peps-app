@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-abstract class Field extends StatefulWidget {
+abstract class Field extends StatefulWidget with ChangeNotifier {
   final String fieldKey;
   final Map schema;
   final Map options;
+  final TextStyle titleStyle = TextStyle(fontSize: 30.0);
 
   String get title =>
       this.schema.containsKey('title') ? this.schema['title'] : '';

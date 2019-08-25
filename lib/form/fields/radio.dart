@@ -12,6 +12,7 @@ class RadioField extends Field {
   @override
   _RadioFieldState createState() {
     _state = _RadioFieldState();
+    _state._onChanged = this.notifyListeners;
     return _state;
   }
 
@@ -23,6 +24,7 @@ class RadioField extends Field {
 
 class _RadioFieldState extends State<RadioField> {
   String _value;
+  Function _onChanged;
 
   Widget get radioList {
     List<Widget> radioListTiles = [];
@@ -37,7 +39,10 @@ class _RadioFieldState extends State<RadioField> {
           title: Text(item['text']),
           value: item['value'],
           groupValue: _value,
-          onChanged: (String newValue) => setState(() => _value = newValue),
+          onChanged: (String newValue) {
+            setState(() => _value = newValue);
+            _onChanged();
+          },
         ),
       );
     }
@@ -52,7 +57,7 @@ class _RadioFieldState extends State<RadioField> {
       children: <Widget>[
         Text(
           widget.title,
-          style: TextStyle(fontSize: 30.0),
+          style: widget.titleStyle,
         ),
         this.radioList,
       ],

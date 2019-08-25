@@ -12,17 +12,20 @@ class CheckboxField extends Field {
   @override
   _CheckboxFieldState createState() {
     _state = _CheckboxFieldState();
+    _state._onChanged = this.notifyListeners;
     return _state;
   }
 
   @override
   Map getJsonValue() {
-    return {fieldKey: _state._selected.join(',')};
+    var isEmpty = _state._selected.length == 0;
+    return {fieldKey: isEmpty ? null : _state._selected.join(',')};
   }
 }
 
 class _CheckboxFieldState extends State<CheckboxField> {
   List<String> _selected = List<String>();
+  Function _onChanged;
 
   void toggleValue(String value, bool toggle) {
     setState(() {
@@ -40,7 +43,10 @@ class _CheckboxFieldState extends State<CheckboxField> {
       checkboxList.add(CheckboxListTile(
         title: Text(text),
         value: checked,
-        onChanged: (bool newValue) => toggleValue(value, newValue),
+        onChanged: (bool newValue) {
+          toggleValue(value, newValue);
+          _onChanged();
+        },
       ));
     }
     return Column(
@@ -54,7 +60,7 @@ class _CheckboxFieldState extends State<CheckboxField> {
       children: <Widget>[
         Text(
           widget.title,
-          style: TextStyle(fontSize: 30.0),
+          style: widget.titleStyle,
         ),
         this.checkboxList,
       ],

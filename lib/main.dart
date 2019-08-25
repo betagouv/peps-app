@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:app/peps_form_slider.dart';
+import 'package:app/form_slider.dart';
 
 Future main() async {
   await DotEnv().load();
@@ -51,7 +51,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
                     final jsonBody = jsonDecode(snapshot.data.body);
                     final jsonProperties = jsonBody['schema']['properties'];
                     final jsonOptions = jsonBody['options']['fields'];
-                    return PepsFormSlider(
+                    return FormSlider(
                       properties: jsonProperties,
                       options: jsonOptions,
                     );
