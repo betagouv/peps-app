@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: primarySwatch,
         primaryColor: primarySwatch.shade500,
-        fontFamily: 'Montserrat',
+        fontFamily: 'Roboto',
       ),
       home: PepsHomePage(title: 'Peps'),
     );

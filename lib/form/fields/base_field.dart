@@ -4,7 +4,11 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
   final String fieldKey;
   final Map schema;
   final Map options;
-  final TextStyle titleStyle = TextStyle(fontSize: 30.0);
+  TextStyle titleStyle = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 30.0,
+    fontFamily: 'SourceSansPro',
+  );
 
   String get title =>
       this.schema.containsKey('title') ? this.schema['title'] : '';
