@@ -127,7 +127,7 @@ class _ArrayFieldState extends State<ArrayField> {
             'Ajouter une culture',
             style: TextStyle(color: Colors.white),
           ),
-          color: Colors.green,
+          color: Theme.of(context).primaryColor,
           onPressed: () => showSelectionScreen(context),
         ),
       ],

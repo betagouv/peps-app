@@ -84,7 +84,7 @@ class _SelectFieldState extends State<SelectField> {
             displayText == null ? 'Choisir' : 'Modifier',
             style: TextStyle(color: Colors.white),
           ),
-          color: Colors.green,
+          color: Theme.of(context).primaryColor,
           onPressed: () => showSelectionScreen(context),
         ),
       ],

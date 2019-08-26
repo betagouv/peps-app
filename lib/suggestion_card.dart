@@ -97,23 +97,23 @@ class SuggestionTable extends StatelessWidget {
 /// about the practice as well as the resource links.
 class SuggestionDrawer extends StatelessWidget {
   final Map json;
-
-  final TextStyle titleStyle = TextStyle(
-    color: Colors.green,
-    fontSize: 18.0,
-    height: 1.5,
-  );
-
   final TextStyle bodyStyle = TextStyle(height: 1.3);
 
   SuggestionDrawer({this.json});
 
   @override
   Widget build(BuildContext context) {
+
+    TextStyle titleStyle = TextStyle(
+      color: Theme.of(context).primaryColor,
+      fontSize: 18.0,
+      height: 1.5,
+    );
+
     return ExpansionTile(
       title: Text(
         'Voir la pratique en détail',
-        style: TextStyle(color: Colors.green),
+        style: TextStyle(color: Theme.of(context).primaryColor),
       ),
       children: <Widget>[
         Padding(
@@ -123,18 +123,18 @@ class SuggestionDrawer extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Marge de manoeuvre',
-                  style: this.titleStyle,
+                  style: titleStyle,
                 ),
                 Text(json['practice']['mechanism']['description'],
                     style: bodyStyle),
                 Text(
                   'Fonctionnement',
-                  style: this.titleStyle,
+                  style: titleStyle,
                 ),
                 Text(json['practice']['description'], style: bodyStyle),
                 Text(
                   'En savoir plus',
-                  style: this.titleStyle,
+                  style: titleStyle,
                 ),
                 Column(
                   children: json['practice']['secondary_resources']
@@ -239,7 +239,7 @@ class ButtonRow extends StatelessWidget {
             child: Icon(
               Icons.bookmark_border,
               size: this.iconSize,
-              color: Colors.green,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ),
@@ -251,7 +251,7 @@ class ButtonRow extends StatelessWidget {
                 'Essayer',
                 style: TextStyle(color: Colors.white),
               ),
-              color: Colors.green,
+              color: Theme.of(context).primaryColor,
               onPressed: () => print('pressed'),
             ),
           ),

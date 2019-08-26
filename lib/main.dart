@@ -9,13 +9,28 @@ Future main() async {
   runApp(MyApp());
 }
 
+MaterialColor primarySwatch = MaterialColor(0xFFFFFFFF, {
+  50: Color(0xFF11F0B3),
+  100: Color(0xFF04D49B),
+  200: Color(0xFF00C28D),
+  300: Color(0xFF00A679),
+  400: Color(0xFF009C72),
+  500: Color(0xFF008763),
+  600: Color(0xFF006E50),
+  700: Color(0xFF005C43),
+  800: Color(0xFF004D38),
+  900: Color(0xFF004230),
+});
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Peps',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: primarySwatch,
+        primaryColor: primarySwatch.shade500,
+        fontFamily: 'Montserrat',
       ),
       home: PepsHomePage(title: 'Peps'),
     );
@@ -35,6 +50,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.grey[100],
         appBar: AppBar(
           title: Text(widget.title),
         ),

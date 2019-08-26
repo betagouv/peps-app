@@ -23,7 +23,7 @@ class Results extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 240, 240, 240),
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('Résultats'),
       ),

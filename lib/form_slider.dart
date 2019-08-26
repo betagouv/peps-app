@@ -161,7 +161,7 @@ class _FormFieldCardState extends State<_FormFieldCard> {
           child: Icon(Icons.arrow_right),
           disabledElevation: 0,
           heroTag: 'btnN',
-          backgroundColor: nextEnabled ? Colors.green : Colors.grey,
+          backgroundColor: nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
         ));
     return widgets;
   }
@@ -178,7 +178,7 @@ class _FormFieldCardState extends State<_FormFieldCard> {
             child: widget.field,
           ),
         ),
-        Card(
+        Container(
           child: Padding(
             padding: EdgeInsets.all(10.0),
             child: Row(
