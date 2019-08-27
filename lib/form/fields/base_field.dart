@@ -30,7 +30,7 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
     var dependencies = this.options['dependencies'];
     for (var key in dependencies.keys) {
 
-      if (!answers.keys.contains(key)) {
+      if (!answers.containsKey(key)) {
         return false;
       }
 

@@ -18,14 +18,17 @@ class SuggestionCard extends StatelessWidget {
             Padding(
               child: Text(
                 json['practice']['mechanism']['name'],
-                style: TextStyle(fontSize: 12.0),
+                style: TextStyle(fontSize: 12.0, color: Colors.grey),
                 textAlign: TextAlign.left,
               ),
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 7.0),
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 7.0),
             ),
             Text(
               json['practice']['title'],
-              style: TextStyle(fontSize: 24.0, fontFamily: 'SourceSansPro', fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  fontSize: 24.0,
+                  fontFamily: 'SourceSansPro',
+                  fontWeight: FontWeight.w600),
             ),
             Divider(),
             SuggestionTable(jsonPractice: json['practice']),
@@ -79,7 +82,9 @@ class SuggestionTable extends StatelessWidget {
             style: TextStyle(color: Colors.grey, height: 1.3),
           ),
           padding: EdgeInsets.all(5.0)),
-      Padding(child: Text(body, style: TextStyle(height: 1.3)), padding: EdgeInsets.all(3.0)),
+      Padding(
+          child: Text(body, style: TextStyle(height: 1.3)),
+          padding: EdgeInsets.all(3.0)),
     ]);
   }
 
@@ -103,46 +108,81 @@ class SuggestionDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     TextStyle titleStyle = TextStyle(
       color: Theme.of(context).primaryColor,
       fontSize: 18.0,
-      height: 1.5,
+      height: 1.3,
     );
+
+    Widget getTitle(String text) {
+      return Padding(
+        child: Text(
+          text.trim(),
+          style: titleStyle,
+        ),
+        padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+      );
+    }
+
+    Widget getBody(String text) {
+      return Text(text.trim(), style: bodyStyle);
+    }
+
+    List<Widget> _getColumnWidgets() {
+      List<Widget> widgets = List<Widget>();
+
+      Map practice = json['practice'];
+
+      if (practice.containsKey('mechanism') &&
+          practice['mechanism'].containsKey('description')) {
+        widgets.add(getTitle('Marge de manoeuvre'));
+        widgets.add(getBody(json['practice']['mechanism']['description']));
+      }
+
+      if (practice.containsKey('description')) {
+        widgets.add(getTitle('Fonctionnement'));
+        widgets.add(getBody(json['practice']['description']));
+      }
+
+      if (practice.containsKey('main_resource')) {
+        Map mainResource = practice['main_resource'];
+        var label = practice.containsKey('main_resource_label')
+            ? practice['main_resource_label']
+            : 'En savoir plus';
+
+        widgets.add(getTitle(label));
+        widgets.add(ResourceLink(json: mainResource));
+      }
+
+      if (json['practice'].containsKey('secondary_resources')) {
+        var shouldAddTitle =
+            json['practice'].containsKey('main_resource_label');
+        if (shouldAddTitle) {
+          widgets.add(getTitle('En savoir plus'));
+        }
+        widgets.add(Column(
+          children: json['practice']['secondary_resources']
+              .map<Widget>((x) => ResourceLink(json: x))
+              .toList(),
+        ));
+      }
+      return widgets;
+    }
 
     return ExpansionTile(
       title: Text(
         'Voir la pratique en détail',
+        textAlign: TextAlign.left,
         style: TextStyle(color: Theme.of(context).primaryColor),
       ),
       children: <Widget>[
         Padding(
-            padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Marge de manoeuvre',
-                  style: titleStyle,
-                ),
-                Text(json['practice']['mechanism']['description'],
-                    style: bodyStyle),
-                Text(
-                  'Fonctionnement',
-                  style: titleStyle,
-                ),
-                Text(json['practice']['description'], style: bodyStyle),
-                Text(
-                  'En savoir plus',
-                  style: titleStyle,
-                ),
-                Column(
-                  children: json['practice']['secondary_resources']
-                      .map<Widget>((x) => ResourceLink(json: x))
-                      .toList(),
-                )
-              ],
-            ))
+          padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _getColumnWidgets(),
+          ),
+        )
       ],
     );
   }
@@ -168,7 +208,6 @@ class ResourceLink extends StatelessWidget {
     return null;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -183,7 +222,7 @@ class ResourceLink extends StatelessWidget {
         child: InkWell(
           onTap: () => launch(Uri.encodeFull(this.json['url'])),
           child: Padding(
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -199,7 +238,7 @@ class ResourceLink extends StatelessWidget {
                               Text(this.json['name']),
                             ],
                           ),
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
                         ),
                         Text(this.json['description'],
                             style: TextStyle(color: Colors.grey, height: 1.3)),
