@@ -29,7 +29,21 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
     /// We check every dependency agains the answers provided.
     var dependencies = this.options['dependencies'];
     for (var key in dependencies.keys) {
-      if (!answers.keys.contains(key) || dependencies[key] != answers[key]) {
+
+      if (!answers.keys.contains(key)) {
+        return false;
+      }
+
+      // We convert both the dependencies and the answers to lists. This makes the
+      // comparison easier since dependencies and answers can be lists (in which any match 
+      // counts as a successful dependency match) or values (e.g., String, int...) in which a
+      // direct comparison counts as a successful dependency match. By treating only with
+      // lists we can simply ask if any item of the answer list is contained in the
+      // dependency list.
+      var dependency = dependencies[key] is List ? dependencies[key] : [dependencies[key]];
+      var answer = answers[key] is List ? answers[key] : [answers[key]];
+
+      if (!answer.any((x) => !!dependency.contains(x))) {
         return false;
       }
     }
