@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
+import 'package:app/searchable_list.dart';
 
 class SelectField extends Field {
   _SelectFieldState _state;
@@ -28,11 +29,12 @@ class _SelectFieldState extends State<SelectField> {
   /// Will display the fullscreen list view to choose from the
   /// different options.
   void showSelectionScreen(BuildContext context) {
-    List<Widget> widgets = List<Widget>();
+    List<SearchableListTile> widgets = List<SearchableListTile>();
     for (var item in widget.options['dataSource']) {
       widgets.add(
-        ListTile(
+        SearchableListTile(
           title: Text(item['text']),
+          searchTerm: item['text'],
           onTap: () {
             setState(() => _value = item['value']);
             _onChanged();
@@ -45,12 +47,7 @@ class _SelectFieldState extends State<SelectField> {
     showBottomSheet(
         context: context,
         builder: (context) {
-          return ListView.separated(
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: widgets.length,
-            itemBuilder: (context, index) => widgets[index],
-            shrinkWrap: true,
-          );
+          return SearchableList(tiles: widgets);
         });
   }
 

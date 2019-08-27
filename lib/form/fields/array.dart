@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
+import 'package:app/searchable_list.dart';
 
 /// The array field allows choosing an ordered list of
 /// elements from options (implements Alpaca's array field
@@ -69,11 +70,12 @@ class _ArrayFieldState extends State<ArrayField> {
   /// Will display the fullscreen list view to choose from the
   /// different options.
   void showSelectionScreen(BuildContext context) {
-    List<Widget> widgets = List<Widget>();
+    List<SearchableListTile> widgets = List<SearchableListTile>();
     for (var item in widget.options['items']['dataSource']) {
       widgets.add(
-        ListTile(
+        SearchableListTile(
           title: Text(item['text']),
+          searchTerm: item['text'],
           onTap: () {
             setState(() {
               _selected.add(item);
@@ -88,12 +90,7 @@ class _ArrayFieldState extends State<ArrayField> {
     showBottomSheet(
         context: context,
         builder: (context) {
-          return ListView.separated(
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: widgets.length,
-            itemBuilder: (context, index) => widgets[index],
-            shrinkWrap: true,
-          );
+          return SearchableList(tiles: widgets);
         });
   }
 
