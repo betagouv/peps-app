@@ -177,7 +177,7 @@ class SuggestionDrawer extends StatelessWidget {
       ),
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
+          padding: EdgeInsets.fromLTRB(6, 0, 6, 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _getColumnWidgets(),
@@ -211,7 +211,7 @@ class ResourceLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
+      padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
       child: Material(
         borderOnForeground: true,
         clipBehavior: Clip.antiAlias,

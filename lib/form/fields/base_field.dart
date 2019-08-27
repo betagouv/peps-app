@@ -35,7 +35,7 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
       }
 
       // We convert both the dependencies and the answers to lists. This makes the
-      // comparison easier since dependencies and answers can be lists (in which any match 
+      // comparison easier since dependencies and answers can be lists (in which any match
       // counts as a successful dependency match) or values (e.g., String, int...) in which a
       // direct comparison counts as a successful dependency match. By treating only with
       // lists we can simply ask if any item of the answer list is contained in the

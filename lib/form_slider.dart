@@ -80,6 +80,7 @@ class FormSlider extends StatelessWidget {
         field: field,
         nextCallback: nextCallback,
         previousCallback: field == this.fields.first ? null : previousCallback,
+        key: PageStorageKey('Page' + this.fields.indexOf(field).toString()),
       ));
     }
 
@@ -115,7 +116,7 @@ class _FormFieldCard extends StatefulWidget {
   final Function previousCallback;
 
   _FormFieldCardState _state;
-  _FormFieldCard({this.field, this.nextCallback, this.previousCallback});
+  _FormFieldCard({this.field, this.nextCallback, this.previousCallback, Key key}) : super(key: key);
 
   void onChanged() {
     var fieldValue = field.getJsonValue();
@@ -137,7 +138,7 @@ class _FormFieldCard extends StatefulWidget {
   }
 }
 
-class _FormFieldCardState extends State<_FormFieldCard> {
+class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveClientMixin {
   bool nextEnabled = false;
 
   void toggleButton(bool active) {
@@ -151,7 +152,7 @@ class _FormFieldCardState extends State<_FormFieldCard> {
         child: FloatingActionButton(
           onPressed: widget.previousCallback,
           child: Icon(Icons.arrow_left),
-          heroTag: 'btnP',
+          heroTag: 'btnP' + widget.key.toString(),
         ),
         padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
       ));
@@ -160,7 +161,7 @@ class _FormFieldCardState extends State<_FormFieldCard> {
           onPressed: nextEnabled ? widget.nextCallback : null,
           child: Icon(Icons.arrow_right),
           disabledElevation: 0,
-          heroTag: 'btnN',
+          heroTag: 'btnN' + widget.key.toString(),
           backgroundColor: nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
         ));
     return widgets;
@@ -190,4 +191,7 @@ class _FormFieldCardState extends State<_FormFieldCard> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
