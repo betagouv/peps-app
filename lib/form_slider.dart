@@ -4,7 +4,7 @@ import 'package:app/form/fields/radio.dart';
 import 'package:app/form/fields/checkbox.dart';
 import 'package:app/form/fields/array.dart';
 import 'package:app/form/fields/select.dart';
-import 'package:app/results.dart';
+import 'package:app/suggestions.dart';
 import 'package:app/form/fields/base_field.dart';
 
 class FormSlider extends StatelessWidget {
@@ -94,7 +94,7 @@ class FormSlider extends StatelessWidget {
     }
     Navigator.of(context).push(
       MaterialPageRoute(
-          builder: (context) => Results(
+          builder: (context) => Suggestions(
                 formResults: formResults,
               )),
     );

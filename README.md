@@ -2,6 +2,8 @@
 
 Frontend mobile application for peps based on Flutter.
 
+🖥️ The repository for Peps' backend/API [can be found here](https://github.com/betagouv/peps).
+
 ## Setup the development environment
 
 ### Install Flutter

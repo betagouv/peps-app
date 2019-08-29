@@ -4,11 +4,26 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SuggestionCard extends StatelessWidget {
   final Map json;
+  final Function hidePractice;
+  final Function hidePracticeType;
 
-  SuggestionCard({this.json});
+  SuggestionCard({this.json, this.hidePractice, this.hidePracticeType});
 
   @override
   Widget build(BuildContext context) {
+    var practice = json['practice'];
+    var mechanism = practice.containsKey('mechanism') &&
+            practice['mechanism'] != null &&
+            practice['mechanism'].containsKey('name')
+        ? practice['mechanism']['name']
+        : '';
+
+    // This weird mapping is because of Dart's inability to cast
+    // List<dynamic> into List<Map>.
+    var _types = practice.containsKey('types') ? practice['types'] : [];
+    List<Map> types = _types.map<Map>((x) => Map.from(x)).toList();
+    ///////
+
     return Card(
       child: Padding(
         padding: EdgeInsets.all(10.0),
@@ -17,7 +32,7 @@ class SuggestionCard extends StatelessWidget {
           children: <Widget>[
             Padding(
               child: Text(
-                json['practice']['mechanism']['name'],
+                mechanism,
                 style: TextStyle(fontSize: 12.0, color: Colors.grey),
                 textAlign: TextAlign.left,
               ),
@@ -33,7 +48,11 @@ class SuggestionCard extends StatelessWidget {
             Divider(),
             SuggestionTable(jsonPractice: json['practice']),
             SuggestionDrawer(json: this.json),
-            ButtonRow(),
+            ButtonRow(
+              hidePractice: hidePractice,
+              hidePracticeType: hidePracticeType,
+              practiceTypes: types.map<Map>((x) => x as Map).toList(),
+            ),
           ],
         ),
       ),
@@ -134,17 +153,20 @@ class SuggestionDrawer extends StatelessWidget {
       Map practice = json['practice'];
 
       if (practice.containsKey('mechanism') &&
+          practice['mechanism'] != null &&
           practice['mechanism'].containsKey('description')) {
         widgets.add(getTitle('Marge de manoeuvre'));
         widgets.add(getBody(json['practice']['mechanism']['description']));
       }
 
-      if (practice.containsKey('description')) {
+      if (practice.containsKey('description') &&
+          practice['description'] != null) {
         widgets.add(getTitle('Fonctionnement'));
         widgets.add(getBody(json['practice']['description']));
       }
 
-      if (practice.containsKey('main_resource')) {
+      if (practice.containsKey('main_resource') &&
+          practice['main_resource'] != null) {
         Map mainResource = practice['main_resource'];
         var label = practice.containsKey('main_resource_label')
             ? practice['main_resource_label']
@@ -154,7 +176,8 @@ class SuggestionDrawer extends StatelessWidget {
         widgets.add(ResourceLink(json: mainResource));
       }
 
-      if (json['practice'].containsKey('secondary_resources')) {
+      if (json['practice'].containsKey('secondary_resources') &&
+          practice['secondary_resources'] != null) {
         var shouldAddTitle =
             json['practice'].containsKey('main_resource_label');
         if (shouldAddTitle) {
@@ -258,6 +281,63 @@ class ResourceLink extends StatelessWidget {
 /// card.
 class ButtonRow extends StatelessWidget {
   final double iconSize = 35.0;
+  final Function hidePractice;
+  final Function hidePracticeType;
+  final List<Map> practiceTypes;
+
+  ButtonRow({this.hidePractice, this.hidePracticeType, this.practiceTypes});
+
+  SimpleDialogOption _createDialogOption(
+      String text, IconData icon, Function function) {
+    return SimpleDialogOption(
+      onPressed: function,
+      child: Padding(
+        child: Row(
+          children: <Widget>[
+            Padding(
+              child: Icon(icon),
+              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+            ),
+            Expanded(
+              child: Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              ),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+      ),
+    );
+  }
+
+  void _blacklistPractice(BuildContext context) {
+    List<Widget> widgets = List<Widget>();
+    widgets.add(_createDialogOption(
+        'Cacher cette pratique', Icons.visibility_off, hidePractice));
+
+    for (var practiceType in practiceTypes) {
+      widgets.add(
+        _createDialogOption(
+          'Cacher toutes les pratiques du type ' + practiceType['display_text'],
+          Icons.visibility_off,
+          () => hidePracticeType(practiceType['id'].toString()),
+        ),
+      );
+    }
+    widgets.add(_createDialogOption(
+        'Annuler', Icons.keyboard_backspace, () => Navigator.pop(context)));
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('Cette pratique n\'est pas pertinente ?'),
+            children: widgets,
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,19 +346,25 @@ class ButtonRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: Icon(
-            Icons.delete_outline,
-            size: this.iconSize,
-            color: Colors.red,
+          child: IconButton(
+            onPressed: () => _blacklistPractice(context),
+            icon: Icon(
+              Icons.delete_outline,
+              size: this.iconSize,
+              color: Colors.red,
+            ),
           ),
         ),
         Expanded(
           child: Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 45, 0),
-            child: Icon(
-              Icons.bookmark_border,
-              size: this.iconSize,
-              color: Theme.of(context).primaryColor,
+            child: IconButton(
+              onPressed: () => print(''),
+              icon: Icon(
+                Icons.bookmark_border,
+                size: this.iconSize,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           ),
         ),
