@@ -30,7 +30,11 @@ class _SelectFieldState extends State<SelectField> {
   /// different options.
   void showSelectionScreen(BuildContext context) {
     List<SearchableListTile> widgets = List<SearchableListTile>();
-    for (var item in widget.options['dataSource']) {
+
+    var dataSource = widget.options['dataSource'];
+    dataSource.sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
+
+    for (var item in dataSource) {
       widgets.add(
         SearchableListTile(
           title: Text(item['text']),

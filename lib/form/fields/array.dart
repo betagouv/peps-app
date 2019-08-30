@@ -71,7 +71,11 @@ class _ArrayFieldState extends State<ArrayField> {
   /// different options.
   void showSelectionScreen(BuildContext context) {
     List<SearchableListTile> widgets = List<SearchableListTile>();
-    for (var item in widget.options['items']['dataSource']) {
+
+    var dataSource = widget.options['items']['dataSource'];
+    dataSource.sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
+
+    for (var item in dataSource) {
       widgets.add(
         SearchableListTile(
           title: Text(item['text']),
