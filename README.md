@@ -20,3 +20,12 @@ BACKEND_URL='the root URL and port of the API server'
 ```
 
 Note that if you are running Peps backend localy and using an Android simulator, the ```BACKEND_URL``` env variable must be set at ```10.0.2.2:8000``` (assuming you started the server with ```python manage.py runserver 0.0.0.0:8000```).
+
+### Add google-services.json for Firebase Crashlytics and Analytics
+
+In order to setup Firebase (Crashlytics and Analytics), make sure you have downloaded the ```google-services.json``` from Firebase and placed it under ```/android/app/google-services.json```. Otherwise you will get this error:
+
+```
+A problem was found with the configuration of task ':app:processDebugGoogleServices'.
+> File './android/app/google-services.json' specified for property 'quickstartFile' does not exist.
+```

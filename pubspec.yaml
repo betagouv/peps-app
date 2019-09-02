@@ -28,6 +28,11 @@ dependencies:
   url_launcher: 5.1.2
   diacritic: 0.1.1
 
+  # Firebase services
+  firebase_core: 0.4.0+1
+  firebase_analytics: 5.0.1
+  firebase_crashlytics: 0.1.0+3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

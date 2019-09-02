@@ -77,3 +77,6 @@
 
 # Key info
 key.properties
+
+# Crashlytics data
+google-services.json
