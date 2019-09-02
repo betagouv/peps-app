@@ -1,4 +1,4 @@
-package com.example.app;
+package fr.gouv.beta.peps;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

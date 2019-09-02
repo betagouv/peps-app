@@ -74,3 +74,6 @@
 
 # Environment variables
 .env*
+
+# Key info
+key.properties
