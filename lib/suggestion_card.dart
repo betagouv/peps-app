@@ -345,19 +345,26 @@ class ButtonRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Expanded(
-          child: IconButton(
-            onPressed: () => _blacklistPractice(context),
-            icon: Icon(
-              Icons.delete_outline,
-              size: this.iconSize,
-              color: Colors.red,
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(10, 0, 25, 0),
+            child: IconButton(
+              onPressed: () => _blacklistPractice(context),
+              icon: Icon(
+                Icons.delete_outline,
+                size: this.iconSize,
+                color: Colors.red,
+              ),
             ),
           ),
         ),
-        Expanded(
+        Flexible(
+          flex: 1,
+          fit: FlexFit.tight,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 45, 0),
+            padding: EdgeInsets.fromLTRB(0, 0, 50, 0),
             child: IconButton(
               onPressed: () => print(''),
               icon: Icon(
@@ -368,9 +375,11 @@ class ButtonRow extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
+        Flexible(
+          flex: 2,
+          fit: FlexFit.tight,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 30, 0),
+            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
             child: RaisedButton(
               child: Text(
                 'Essayer',
