@@ -56,33 +56,67 @@ class PepsHomePage extends StatefulWidget {
 }
 
 class _PepsHomePageState extends State<PepsHomePage> {
+  Future getFormSchema() async {
+    try {
+      return await http.get(
+          new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'),
+          headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
+    } catch (e) {
+      print(e);
+      return e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          title: Text(widget.title),
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: new FutureBuilder(
+          future: getFormSchema(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot == null ||
+                snapshot.data is Exception ||
+                snapshot.data == null) {
+              return Padding(
+                padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
+                child: Column(
+                  children: <Widget>[
+                    Icon(
+                      Icons.signal_wifi_off,
+                      size: 50,
+                      color: Colors.grey[400],
+                    ),
+                    Padding(
+                      child:
+                          Text('Oops ! Une erreur de connexion est survenue'),
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                    ),
+                    RaisedButton(
+                      child: Text('Ressayer'),
+                      onPressed: () => setState(() {}),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final jsonBody = jsonDecode(snapshot.data.body);
+            final jsonProperties = jsonBody['schema']['properties'];
+            final jsonOptions = jsonBody['options']['fields'];
+            return FormSlider(
+              properties: jsonProperties,
+              options: jsonOptions,
+            );
+          },
         ),
-        body: Center(
-            child: new FutureBuilder(
-                future: http.get(
-                    new Uri.http(
-                        DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'),
-                    headers: {
-                      'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']
-                    }),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    final jsonBody = jsonDecode(snapshot.data.body);
-                    final jsonProperties = jsonBody['schema']['properties'];
-                    final jsonOptions = jsonBody['options']['fields'];
-                    return FormSlider(
-                      properties: jsonProperties,
-                      options: jsonOptions,
-                    );
-                  } else {
-                    return CircularProgressIndicator();
-                  }
-                })));
+      ),
+    );
   }
 }
