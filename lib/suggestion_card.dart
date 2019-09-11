@@ -41,9 +41,10 @@ class SuggestionCard extends StatelessWidget {
             Text(
               json['practice']['title'],
               style: TextStyle(
-                  fontSize: 24.0,
-                  fontFamily: 'SourceSansPro',
-                  fontWeight: FontWeight.w600),
+                fontSize: 24.0,
+                fontFamily: 'SourceSansPro',
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Divider(),
             SuggestionTable(jsonPractice: json['practice']),

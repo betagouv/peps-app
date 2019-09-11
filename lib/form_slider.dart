@@ -67,19 +67,11 @@ class FormSlider extends StatelessWidget {
       goToSuggestions(context);
     };
 
-    var previousCallback = () {
-      if (fieldStack.length > 1) {
-        fieldStack.removeLast();
-        pageController.animateToPage(fieldStack.last,
-            duration: Duration(milliseconds: 200), curve: Curves.ease);
-      }
-    };
-
     for (var field in this.fields) {
       children.add(_FormFieldCard(
         field: field,
         nextCallback: nextCallback,
-        previousCallback: field == this.fields.first ? null : previousCallback,
+        previousCallback: field == this.fields.first ? null : this.goBack,
         key: PageStorageKey('Page' + this.fields.indexOf(field).toString()),
       ));
     }
@@ -102,11 +94,28 @@ class FormSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      physics: NeverScrollableScrollPhysics(),
-      controller: pageController,
-      children: _getChildren(context),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: PageView(
+        physics: NeverScrollableScrollPhysics(),
+        controller: pageController,
+        children: _getChildren(context),
+      ),
     );
+  }
+
+  void goBack() {
+    if (fieldStack.length > 1) {
+      fieldStack.removeLast();
+      pageController.animateToPage(fieldStack.last,
+          duration: Duration(milliseconds: 200), curve: Curves.ease);
+    }
+  }
+
+  Future<bool> _onWillPop() {
+    var shouldClose = fieldStack.length == 1;
+    goBack();
+    return Future.value(shouldClose);
   }
 }
 
@@ -116,7 +125,9 @@ class _FormFieldCard extends StatefulWidget {
   final Function previousCallback;
 
   _FormFieldCardState _state;
-  _FormFieldCard({this.field, this.nextCallback, this.previousCallback, Key key}) : super(key: key);
+  _FormFieldCard(
+      {this.field, this.nextCallback, this.previousCallback, Key key})
+      : super(key: key);
 
   void onChanged() {
     var fieldValue = field.getJsonValue();
@@ -138,7 +149,8 @@ class _FormFieldCard extends StatefulWidget {
   }
 }
 
-class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveClientMixin {
+class _FormFieldCardState extends State<_FormFieldCard>
+    with AutomaticKeepAliveClientMixin {
   bool nextEnabled = false;
 
   void toggleButton(bool active) {
@@ -158,18 +170,18 @@ class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveC
       ));
     }
     widgets.add(FloatingActionButton(
-          onPressed: nextEnabled ? widget.nextCallback : null,
-          child: Icon(Icons.arrow_right),
-          disabledElevation: 0,
-          heroTag: 'btnN' + widget.key.toString(),
-          backgroundColor: nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
-        ));
+      onPressed: nextEnabled ? widget.nextCallback : null,
+      child: Icon(Icons.arrow_right),
+      disabledElevation: 0,
+      heroTag: 'btnN' + widget.key.toString(),
+      backgroundColor:
+          nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
+    ));
     return widgets;
   }
 
   @override
   Widget build(BuildContext context) {
-
     return ListView(
       padding: EdgeInsets.all(10.0),
       children: <Widget>[

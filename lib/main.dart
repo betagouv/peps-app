@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:app/form_slider.dart';
+import 'package:app/landingview.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -32,13 +32,13 @@ class MyApp extends StatelessWidget {
   FirebaseAnalytics analytics = FirebaseAnalytics();
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Peps',
       navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
       theme: ThemeData(
         primarySwatch: primarySwatch,
         primaryColor: primarySwatch.shade500,
+        accentColor: primarySwatch.shade700,
         fontFamily: 'Roboto',
       ),
       home: PepsHomePage(title: 'Peps'),
@@ -56,7 +56,64 @@ class PepsHomePage extends StatefulWidget {
 }
 
 class _PepsHomePageState extends State<PepsHomePage> {
-  Future getFormSchema() async {
+
+  
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: Center(
+        child: new FutureBuilder(
+          future: fetchFormSchema(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return CircularProgressIndicator();
+            }
+            var hasError = snapshot == null ||
+                snapshot.data is Exception ||
+                snapshot.data == null;
+            if (hasError) {
+              return getErrorWidget(context);
+            }
+
+            final jsonBody = jsonDecode(snapshot.data.body);
+            final jsonProperties = jsonBody['schema']['properties'];
+            final jsonOptions = jsonBody['options']['fields'];
+            return LandingView(
+              jsonProperties: jsonProperties,
+              jsonOptions: jsonOptions,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget getErrorWidget(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
+      child: Column(
+        children: <Widget>[
+          Icon(
+            Icons.signal_wifi_off,
+            size: 50,
+            color: Colors.grey[400],
+          ),
+          Padding(
+            child: Text('Oops ! Une erreur de connexion est survenue'),
+            padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+          ),
+          RaisedButton(
+            child: Text('Ressayer'),
+            onPressed: () => setState(() {}),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future fetchFormSchema() async {
     try {
       return await http.get(
           new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'),
@@ -65,58 +122,5 @@ class _PepsHomePageState extends State<PepsHomePage> {
       print(e);
       return e;
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: new FutureBuilder(
-          future: getFormSchema(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return CircularProgressIndicator();
-            }
-            if (snapshot == null ||
-                snapshot.data is Exception ||
-                snapshot.data == null) {
-              return Padding(
-                padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
-                child: Column(
-                  children: <Widget>[
-                    Icon(
-                      Icons.signal_wifi_off,
-                      size: 50,
-                      color: Colors.grey[400],
-                    ),
-                    Padding(
-                      child:
-                          Text('Oops ! Une erreur de connexion est survenue'),
-                      padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
-                    ),
-                    RaisedButton(
-                      child: Text('Ressayer'),
-                      onPressed: () => setState(() {}),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            final jsonBody = jsonDecode(snapshot.data.body);
-            final jsonProperties = jsonBody['schema']['properties'];
-            final jsonOptions = jsonBody['options']['fields'];
-            return FormSlider(
-              properties: jsonProperties,
-              options: jsonOptions,
-            );
-          },
-        ),
-      ),
-    );
   }
 }
