@@ -52,7 +52,7 @@ class SuggestionCard extends StatelessWidget {
             ButtonRow(
               hidePractice: hidePractice,
               hidePracticeType: hidePracticeType,
-              practiceTypes: types.map<Map>((x) => x as Map).toList(),
+              practiceTypes: types.map<Map>((x) => x).toList(),
             ),
           ],
         ),
@@ -246,32 +246,38 @@ class ResourceLink extends StatelessWidget {
         child: InkWell(
           onTap: () => launch(Uri.encodeFull(this.json['url'])),
           child: Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          child: Row(
-                            children: <Widget>[
-                              Padding(
-                                child: getIcon(),
-                                padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              child: getIcon(),
+                              padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                            ),
+                            Flexible(
+                              child: Text(
+                                this.json['name'],
+                                style: TextStyle(height: 1.3),
                               ),
-                              Text(this.json['name']),
-                            ],
-                          ),
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                            ),
+                          ],
                         ),
-                        Text(this.json['description'],
-                            style: TextStyle(color: Colors.grey, height: 1.3)),
-                      ],
-                    ),
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                      ),
+                      Text(this.json['description'],
+                          style: TextStyle(color: Colors.grey, height: 1.3)),
+                    ],
                   ),
-                  Icon(Icons.arrow_right)
-                ],
-              )),
+                ),
+                Icon(Icons.arrow_right)
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -78,7 +78,7 @@ class _LandingViewState extends State<LandingView> {
     return RaisedButton(
       color: Colors.white,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
+        padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Text(
           'Améliorer mon système',
           style: TextStyle(
@@ -121,11 +121,11 @@ class _LandingViewState extends State<LandingView> {
           child: ListTile(
             leading: Padding(
               child: Icon(Icons.bookmark),
-              padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
             ),
             title: Padding(
               child: Text('Pratiques sauvegardées'),
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             trailing: Icon(Icons.chevron_right),
           ),
@@ -134,11 +134,11 @@ class _LandingViewState extends State<LandingView> {
           child: ListTile(
             leading: Padding(
               child: Icon(Icons.access_time),
-              padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
             ),
             title: Padding(
               child: Text('Historique'),
-              padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             trailing: Icon(Icons.chevron_right),
           ),
