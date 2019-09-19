@@ -80,3 +80,6 @@ key.properties
 
 # Crashlytics data
 google-services.json
+
+# Flutter automatic files
+flutter_export_environment.sh
