@@ -244,7 +244,9 @@ class ResourceLink extends StatelessWidget {
             borderRadius: BorderRadius.circular(5)),
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => launch(Uri.encodeFull(this.json['url'])),
+          onTap: () {
+            launch(this.json['url']);
+          },
           child: Padding(
             padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
             child: Row(
