@@ -177,8 +177,12 @@ class SuggestionDrawer extends StatelessWidget {
         widgets.add(ResourceLink(json: mainResource));
       }
 
-      if (json['practice'].containsKey('secondary_resources') &&
-          practice['secondary_resources'] != null) {
+      var secondaryResources =
+          json['practice'].containsKey('secondary_resources')
+              ? practice['secondary_resources']
+              : [];
+
+      if (secondaryResources != null && secondaryResources.length > 0) {
         var shouldAddTitle =
             json['practice'].containsKey('main_resource_label');
         if (shouldAddTitle) {
