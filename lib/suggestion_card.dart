@@ -1,3 +1,4 @@
+import 'package:app/implementation_view.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -399,7 +400,18 @@ class ButtonRow extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
               color: Theme.of(context).primaryColor,
-              onPressed: () => print('pressed'),
+              onPressed: () {
+                showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    title: Text('Mise en place'),
+                    children: <Widget>[
+                      ImplementationView(),
+                    ],
+                  );
+                });
+              },
             ),
           ),
         ),

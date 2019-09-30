@@ -165,6 +165,7 @@ class _FormFieldCardState extends State<_FormFieldCard>
           onPressed: widget.previousCallback,
           child: Icon(Icons.arrow_left),
           heroTag: 'btnP' + widget.key.toString(),
+          backgroundColor: Theme.of(context).primaryColor,
         ),
         padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
       ));

@@ -31,6 +31,7 @@ class _SuggestionsState extends State<Suggestions> {
   Map formResults;
   List<String> practiceBlacklist;
   List<String> typeBlacklist;
+  Future _loadSuggestions;
 
   List<Widget> getSuggestionWidgets(List suggestions, BuildContext context) {
     List<Widget> widgets = List<Widget>();
@@ -40,6 +41,7 @@ class _SuggestionsState extends State<Suggestions> {
         List<String> newBlacklist = [typeId];
         newBlacklist.addAll(typeBlacklist);
         typeBlacklist = newBlacklist;
+        _assignFuture();
       });
       Navigator.pop(context);
     };
@@ -50,6 +52,7 @@ class _SuggestionsState extends State<Suggestions> {
           List<String> newBlacklist = [suggestion['practice']['id'].toString()];
           newBlacklist.addAll(practiceBlacklist);
           practiceBlacklist = newBlacklist;
+          _assignFuture();
         });
         Navigator.pop(context);
       };
@@ -64,6 +67,27 @@ class _SuggestionsState extends State<Suggestions> {
   }
 
   @override
+  void initState() {
+    _assignFuture();
+    super.initState();
+  }
+
+  void _assignFuture() {
+    _loadSuggestions = http.post(
+      new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/calculateRankings'),
+      body: jsonEncode({
+        'answers': this.formResults,
+        'practice_blacklist': this.practiceBlacklist,
+        'type_blacklist': this.typeBlacklist,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Api-Key ' + DotEnv().env['API_KEY'],
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -72,19 +96,7 @@ class _SuggestionsState extends State<Suggestions> {
       ),
       body: Center(
         child: new FutureBuilder(
-          future: http.post(
-            new Uri.http(
-                DotEnv().env['BACKEND_URL'], '/api/v1/calculateRankings'),
-            body: jsonEncode({
-              'answers': this.formResults,
-              'practice_blacklist': this.practiceBlacklist,
-              'type_blacklist': this.typeBlacklist,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Api-Key ' + DotEnv().env['API_KEY'],
-            },
-          ),
+          future: _loadSuggestions,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               final jsonBody = jsonDecode(utf8.decode(snapshot.data.bodyBytes));

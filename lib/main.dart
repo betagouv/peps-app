@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app/models/form_descriptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -57,7 +58,13 @@ class PepsHomePage extends StatefulWidget {
 
 class _PepsHomePageState extends State<PepsHomePage> {
 
-  
+  Future _loadForm;
+
+  @override
+  void initState() {
+    _loadForm = fetchFormSchema();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +72,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
       backgroundColor: Colors.grey[100],
       body: Center(
         child: new FutureBuilder(
-          future: fetchFormSchema(),
+          future: _loadForm,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return CircularProgressIndicator();
@@ -80,6 +87,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
             final jsonBody = jsonDecode(snapshot.data.body);
             final jsonProperties = jsonBody['schema']['properties'];
             final jsonOptions = jsonBody['options']['fields'];
+
             return LandingView(
               jsonProperties: jsonProperties,
               jsonOptions: jsonOptions,
