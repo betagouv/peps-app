@@ -84,12 +84,14 @@ class FormSlider extends StatelessWidget {
     for (var field in this.fields) {
       formResults.addAll(field.getJsonValue());
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (context) => Suggestions(
-                formResults: formResults,
-              )),
-    );
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => Suggestions(
+                  formResults: formResults,
+                )),
+        (Route<dynamic> route) {
+          return route.isFirst;
+        });
   }
 
   @override
