@@ -355,12 +355,14 @@ class ButtonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Spacer(flex: 1,),
         Flexible(
-          flex: 1,
+          flex: 2,
           fit: FlexFit.tight,
           child: Padding(
             padding: EdgeInsets.fromLTRB(10, 0, 25, 0),
@@ -375,42 +377,22 @@ class ButtonRow extends StatelessWidget {
           ),
         ),
         Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 50, 0),
-            child: IconButton(
-              onPressed: () => print(''),
-              icon: Icon(
-                Icons.bookmark_border,
-                size: this.iconSize,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        ),
-        Flexible(
-          flex: 2,
+          flex: 3,
           fit: FlexFit.tight,
           child: Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
             child: RaisedButton(
               child: Text(
                 'Essayer',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () {
-                showDialog(
-                context: context,
-                builder: (context) {
-                  return SimpleDialog(
-                    title: Text('Mise en place'),
-                    children: <Widget>[
-                      ImplementationView(),
-                    ],
-                  );
-                });
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ImplementationView()));
               },
             ),
           ),

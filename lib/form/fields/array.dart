@@ -73,7 +73,8 @@ class _ArrayFieldState extends State<ArrayField> {
     List<SearchableListTile> widgets = List<SearchableListTile>();
 
     var dataSource = widget.options['items']['dataSource'];
-    dataSource.sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
+    dataSource
+        .sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
 
     for (var item in dataSource) {
       widgets.add(
