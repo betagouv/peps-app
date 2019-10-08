@@ -113,7 +113,9 @@ class _PepsHomePageState extends State<PepsHomePage> {
           ),
           RaisedButton(
             child: Text('Ressayer'),
-            onPressed: () => setState(() {}),
+            onPressed: () => setState(() {
+              _loadForm = fetchFormSchema();
+            }),
           ),
         ],
       ),
