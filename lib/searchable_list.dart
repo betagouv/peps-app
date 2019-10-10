@@ -55,12 +55,11 @@ class SearchableListTile extends ListTile {
 class SearchableList extends StatefulWidget {
   final List<SearchableListTile> tiles;
 
-  _SearchableListState _state;
   SearchableList({this.tiles});
 
   @override
   State<StatefulWidget> createState() {
-    _state = _SearchableListState(completeList: tiles);
+    var _state = _SearchableListState(completeList: tiles);
     return _state;
   }
 }

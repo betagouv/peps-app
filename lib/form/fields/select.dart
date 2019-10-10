@@ -4,21 +4,26 @@ import 'package:app/form/fields/base_field.dart';
 import 'package:app/searchable_list.dart';
 
 class SelectField extends Field {
-  _SelectFieldState _state;
+  String selected;
 
   SelectField({String fieldKey, Map schema, Map options})
       : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _SelectFieldState createState() {
-    _state = _SelectFieldState();
-    _state._onChanged = this.notifyListeners;
+    var _state = _SelectFieldState();
+    _state._onChanged = onChanged;
     return _state;
+  }
+
+  onChanged(_selected) {
+    this.selected = _selected;
+    notifyListeners();
   }
 
   @override
   Map getJsonValue() {
-    return {fieldKey: _state._value};
+    return {fieldKey: this.selected};
   }
 }
 
@@ -41,7 +46,7 @@ class _SelectFieldState extends State<SelectField> {
           searchTerm: item['text'],
           onTap: () {
             setState(() => _value = item['value']);
-            _onChanged();
+            _onChanged(item['value']);
             Navigator.of(context).pop();
           },
         ),

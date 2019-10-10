@@ -7,22 +7,31 @@ import 'package:app/searchable_list.dart';
 /// elements from options (implements Alpaca's array field
 /// http://www.alpacajs.org/docs/fields/array.html).
 class ArrayField extends Field {
-  _ArrayFieldState _state;
+
+  List<String> selected;
 
   ArrayField({String fieldKey, Map schema, Map options})
       : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _ArrayFieldState createState() {
-    _state = _ArrayFieldState();
-    _state._onChanged = this.notifyListeners;
+    var _state = _ArrayFieldState();
+    _state._onChanged = onChanged;
     return _state;
+  }
+
+  onChanged(_selected) {
+    if (_selected.length == 0) {
+      this.selected = null;
+    } else {
+      this.selected = _selected.map<String>((item) => item['value'].toString()).toList();
+    }
+    notifyListeners();
   }
 
   @override
   Map getJsonValue() {
-    var isEmpty = _state._selected.length == 0;
-    return {fieldKey: isEmpty ? null : _state._selected.map((item) => item['value']).join(',')};
+    return {fieldKey: this.selected};
   }
 }
 
@@ -45,7 +54,7 @@ class _ArrayFieldState extends State<ArrayField> {
       _selected[index1] = _selected[index2];
       _selected[index2] = tmp;
     });
-    _onChanged();
+    _onChanged(_selected);
   }
 
   /// Returns the list of items to be displayed in the
@@ -60,7 +69,7 @@ class _ArrayFieldState extends State<ArrayField> {
         swapDown: () => swap(i, i + 1),
         onDismissed: (dir) {
           setState(() => _selected.removeAt(i));
-          _onChanged();
+          _onChanged(_selected);
         },
       ));
     }
@@ -85,7 +94,7 @@ class _ArrayFieldState extends State<ArrayField> {
             setState(() {
               _selected.add(item);
             });
-            _onChanged();
+            _onChanged(_selected);
             Navigator.of(context).pop();
           },
         ),

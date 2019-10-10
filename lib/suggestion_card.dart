@@ -5,17 +5,34 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SuggestionCard extends StatelessWidget {
   final Map json;
+  final Map answers;
   final Function hidePractice;
   final Function hidePracticeType;
 
-  SuggestionCard({this.json, this.hidePractice, this.hidePracticeType});
+  SuggestionCard({this.json, this.answers, this.hidePractice, this.hidePracticeType})
+      : assert(json != null),
+        assert(answers != null),
+        assert(hidePracticeType != null),
+        assert(hidePracticeType != null);
+
+  void tryPractice(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        settings: RouteSettings(
+          name: 'Implementation',
+        ),
+        builder: (context) => ImplementationView(
+          answers: answers,
+          practiceId: json['practice']['external_id'],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     var practice = json['practice'];
-    var mechanism = practice.containsKey('mechanism') &&
-            practice['mechanism'] != null &&
-            practice['mechanism'].containsKey('name')
+    var mechanism = practice.containsKey('mechanism') && practice['mechanism'] != null && practice['mechanism'].containsKey('name')
         ? practice['mechanism']['name']
         : '';
 
@@ -54,6 +71,7 @@ class SuggestionCard extends StatelessWidget {
               hidePractice: hidePractice,
               hidePracticeType: hidePracticeType,
               practiceTypes: types.map<Map>((x) => x).toList(),
+              tryPractice: tryPractice,
             ),
           ],
         ),
@@ -67,28 +85,23 @@ class SuggestionCard extends StatelessWidget {
 class SuggestionTable extends StatelessWidget {
   final Map jsonPractice;
 
-  SuggestionTable({this.jsonPractice});
+  SuggestionTable({this.jsonPractice}) : assert(jsonPractice != null);
 
   List<TableRow> getTableRows() {
     List<TableRow> tableRows = List<TableRow>();
-    if (jsonPractice.containsKey('equipment') &&
-        jsonPractice['equipment'] != null) {
+    if (jsonPractice.containsKey('equipment') && jsonPractice['equipment'] != null) {
       tableRows.add(getTableRow('Matériel', jsonPractice['equipment']));
     }
-    if (jsonPractice.containsKey('schedule') &&
-        jsonPractice['schedule'] != null) {
+    if (jsonPractice.containsKey('schedule') && jsonPractice['schedule'] != null) {
       tableRows.add(getTableRow('Période', jsonPractice['schedule']));
     }
     if (jsonPractice.containsKey('impact') && jsonPractice['impact'] != null) {
       tableRows.add(getTableRow('Impact', jsonPractice['impact']));
     }
-    if (jsonPractice.containsKey('additional_benefits') &&
-        jsonPractice['additional_benefits'] != null) {
-      tableRows
-          .add(getTableRow('Bénéfices', jsonPractice['additional_benefits']));
+    if (jsonPractice.containsKey('additional_benefits') && jsonPractice['additional_benefits'] != null) {
+      tableRows.add(getTableRow('Bénéfices', jsonPractice['additional_benefits']));
     }
-    if (jsonPractice.containsKey('success_factors') &&
-        jsonPractice['success_factors'] != null) {
+    if (jsonPractice.containsKey('success_factors') && jsonPractice['success_factors'] != null) {
       tableRows.add(getTableRow('Réussite', jsonPractice['success_factors']));
     }
 
@@ -103,9 +116,7 @@ class SuggestionTable extends StatelessWidget {
             style: TextStyle(color: Colors.grey, height: 1.3),
           ),
           padding: EdgeInsets.all(5.0)),
-      Padding(
-          child: Text(body, style: TextStyle(height: 1.3)),
-          padding: EdgeInsets.all(3.0)),
+      Padding(child: Text(body, style: TextStyle(height: 1.3)), padding: EdgeInsets.all(3.0)),
     ]);
   }
 
@@ -125,7 +136,7 @@ class SuggestionDrawer extends StatelessWidget {
   final Map json;
   final TextStyle bodyStyle = TextStyle(height: 1.3);
 
-  SuggestionDrawer({this.json});
+  SuggestionDrawer({this.json}) : assert(json != null);
 
   @override
   Widget build(BuildContext context) {
@@ -154,45 +165,33 @@ class SuggestionDrawer extends StatelessWidget {
 
       Map practice = json['practice'];
 
-      if (practice.containsKey('mechanism') &&
-          practice['mechanism'] != null &&
-          practice['mechanism'].containsKey('description')) {
+      if (practice.containsKey('mechanism') && practice['mechanism'] != null && practice['mechanism'].containsKey('description')) {
         widgets.add(getTitle('Marge de manoeuvre'));
         widgets.add(getBody(json['practice']['mechanism']['description']));
       }
 
-      if (practice.containsKey('description') &&
-          practice['description'] != null) {
+      if (practice.containsKey('description') && practice['description'] != null) {
         widgets.add(getTitle('Fonctionnement'));
         widgets.add(getBody(json['practice']['description']));
       }
 
-      if (practice.containsKey('main_resource') &&
-          practice['main_resource'] != null) {
+      if (practice.containsKey('main_resource') && practice['main_resource'] != null) {
         Map mainResource = practice['main_resource'];
-        var label = practice.containsKey('main_resource_label')
-            ? practice['main_resource_label']
-            : 'En savoir plus';
+        var label = practice.containsKey('main_resource_label') ? practice['main_resource_label'] : 'En savoir plus';
 
         widgets.add(getTitle(label));
         widgets.add(ResourceLink(json: mainResource));
       }
 
-      var secondaryResources =
-          json['practice'].containsKey('secondary_resources')
-              ? practice['secondary_resources']
-              : [];
+      var secondaryResources = json['practice'].containsKey('secondary_resources') ? practice['secondary_resources'] : [];
 
       if (secondaryResources != null && secondaryResources.length > 0) {
-        var shouldAddTitle =
-            json['practice'].containsKey('main_resource_label');
+        var shouldAddTitle = json['practice'].containsKey('main_resource_label');
         if (shouldAddTitle) {
           widgets.add(getTitle('En savoir plus'));
         }
         widgets.add(Column(
-          children: json['practice']['secondary_resources']
-              .map<Widget>((x) => ResourceLink(json: x))
-              .toList(),
+          children: json['practice']['secondary_resources'].map<Widget>((x) => ResourceLink(json: x)).toList(),
         ));
       }
       return widgets;
@@ -222,7 +221,7 @@ class SuggestionDrawer extends StatelessWidget {
 class ResourceLink extends StatelessWidget {
   final Map json;
 
-  ResourceLink({this.json});
+  ResourceLink({this.json}) : assert(json != null);
 
   Icon getIcon() {
     if (this.json['resource_type'] == 'PDF') {
@@ -244,9 +243,7 @@ class ResourceLink extends StatelessWidget {
       child: Material(
         borderOnForeground: true,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-            side: BorderSide(width: 0.5, color: Colors.grey),
-            borderRadius: BorderRadius.circular(5)),
+        shape: RoundedRectangleBorder(side: BorderSide(width: 0.5, color: Colors.grey), borderRadius: BorderRadius.circular(5)),
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
@@ -276,8 +273,7 @@ class ResourceLink extends StatelessWidget {
                         ),
                         padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
                       ),
-                      Text(this.json['description'],
-                          style: TextStyle(color: Colors.grey, height: 1.3)),
+                      Text(this.json['description'], style: TextStyle(color: Colors.grey, height: 1.3)),
                     ],
                   ),
                 ),
@@ -297,12 +293,20 @@ class ButtonRow extends StatelessWidget {
   final double iconSize = 35.0;
   final Function hidePractice;
   final Function hidePracticeType;
+  final Function tryPractice;
   final List<Map> practiceTypes;
 
-  ButtonRow({this.hidePractice, this.hidePracticeType, this.practiceTypes});
+  ButtonRow({
+    this.hidePractice,
+    this.hidePracticeType,
+    this.practiceTypes,
+    this.tryPractice,
+  })  : assert(hidePractice != null),
+        assert(hidePracticeType != null),
+        assert(practiceTypes != null),
+        assert(tryPractice != null);
 
-  SimpleDialogOption _createDialogOption(
-      String text, IconData icon, Function function) {
+  SimpleDialogOption _createDialogOption(String text, IconData icon, Function function) {
     return SimpleDialogOption(
       onPressed: function,
       child: Padding(
@@ -328,8 +332,7 @@ class ButtonRow extends StatelessWidget {
 
   void _blacklistPractice(BuildContext context) {
     List<Widget> widgets = List<Widget>();
-    widgets.add(_createDialogOption(
-        'Cacher cette pratique', Icons.visibility_off, hidePractice));
+    widgets.add(_createDialogOption('Cacher cette pratique', Icons.visibility_off, hidePractice));
 
     for (var practiceType in practiceTypes) {
       widgets.add(
@@ -340,27 +343,28 @@ class ButtonRow extends StatelessWidget {
         ),
       );
     }
-    widgets.add(_createDialogOption(
-        'Annuler', Icons.keyboard_backspace, () => Navigator.pop(context)));
+    widgets.add(_createDialogOption('Annuler', Icons.keyboard_backspace, () => Navigator.pop(context)));
 
     showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            title: Text('Cette pratique n\'est pas pertinente ?'),
-            children: widgets,
-          );
-        });
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text('Cette pratique n\'est pas pertinente ?'),
+          children: widgets,
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Spacer(flex: 1,),
+        Spacer(
+          flex: 1,
+        ),
         Flexible(
           flex: 2,
           fit: FlexFit.tight,
@@ -390,10 +394,7 @@ class ButtonRow extends StatelessWidget {
                 ),
               ),
               color: Theme.of(context).primaryColor,
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ImplementationView()));
-              },
+              onPressed: () => tryPractice(context),
             ),
           ),
         ),

@@ -10,16 +10,14 @@ class Suggestions extends StatefulWidget {
   final List<String> practiceBlacklist;
   final List<String> typeBlacklist;
 
-  Suggestions(
-      {this.formResults,
-      this.practiceBlacklist = const [],
-      this.typeBlacklist = const []});
-
-  _SuggestionsState _state;
+  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const []})
+      : assert(formResults != null),
+        assert(practiceBlacklist != null),
+        assert(typeBlacklist != null);
 
   @override
   State<StatefulWidget> createState() {
-    _state = _SuggestionsState();
+    var _state = _SuggestionsState();
     _state.formResults = formResults;
     _state.practiceBlacklist = practiceBlacklist;
     _state.typeBlacklist = typeBlacklist;
@@ -61,6 +59,7 @@ class _SuggestionsState extends State<Suggestions> {
         json: suggestion,
         hidePractice: hidePractice,
         hidePracticeType: hidePracticeType,
+        answers: formResults,
       ));
     }
     return widgets;

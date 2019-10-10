@@ -4,21 +4,26 @@ import 'package:app/form/fields/base_field.dart';
 
 class RadioField extends Field {
 
-  _RadioFieldState _state;
+  String selected;
 
   RadioField({String fieldKey, Map schema, Map options})
       : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _RadioFieldState createState() {
-    _state = _RadioFieldState();
-    _state._onChanged = this.notifyListeners;
+    var _state = _RadioFieldState();
+    _state._onChanged = onChanged;
     return _state;
+  }
+
+  onChanged(_selected) {
+    this.selected = _selected;
+    notifyListeners();
   }
 
   @override
   Map getJsonValue() {
-    return {fieldKey: _state._value};
+    return {fieldKey: this.selected};
   }
 }
 
@@ -41,7 +46,7 @@ class _RadioFieldState extends State<RadioField> {
           groupValue: _value,
           onChanged: (String newValue) {
             setState(() => _value = newValue);
-            _onChanged();
+            _onChanged(newValue);
           },
         ),
       );

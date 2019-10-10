@@ -15,7 +15,9 @@ class FormSlider extends StatelessWidget {
   List<int> fieldStack = [0];
 
   FormSlider({this.properties, this.options})
-      : pageController = PageController(initialPage: 0),
+      : assert(properties != null),
+        assert(options != null),
+        pageController = PageController(initialPage: 0),
         fields = FormSlider.createFields(properties, options);
 
   static List<Field> createFields(Map properties, Map options) {
@@ -88,10 +90,9 @@ class FormSlider extends StatelessWidget {
         MaterialPageRoute(
             builder: (context) => Suggestions(
                   formResults: formResults,
-                )),
-        (Route<dynamic> route) {
-          return route.isFirst;
-        });
+                )), (Route<dynamic> route) {
+      return route.isFirst;
+    });
   }
 
   @override
@@ -129,7 +130,10 @@ class _FormFieldCard extends StatefulWidget {
   _FormFieldCardState _state;
   _FormFieldCard(
       {this.field, this.nextCallback, this.previousCallback, Key key})
-      : super(key: key);
+      : assert(field != null),
+        assert(nextCallback != null),
+        assert(key != null),
+        super(key: key);
 
   void onChanged() {
     var fieldValue = field.getJsonValue();

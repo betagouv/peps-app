@@ -4,22 +4,30 @@ import 'package:app/form/fields/base_field.dart';
 
 class CheckboxField extends Field {
 
-  _CheckboxFieldState _state;
+  List<String> selected = List<String>();
 
   CheckboxField({String fieldKey, Map schema, Map options})
       : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _CheckboxFieldState createState() {
-    _state = _CheckboxFieldState();
-    _state._onChanged = this.notifyListeners;
-    return _state;
+    var state = _CheckboxFieldState();
+    state._onChanged = onChanged;
+    return state;
+  }
+
+  onChanged(_selected) {
+    this.selected = [];
+    for (var item in _selected) {
+      this.selected.add(item);
+    }
+    notifyListeners();
   }
 
   @override
   Map getJsonValue() {
-    var isEmpty = _state._selected.length == 0;
-    return {fieldKey: isEmpty ? null : _state._selected.join(',')};
+    var isEmpty = selected.length == 0;
+    return {fieldKey: isEmpty ? null : selected.join(',')};
   }
 }
 
@@ -28,9 +36,9 @@ class _CheckboxFieldState extends State<CheckboxField> {
   Function _onChanged;
 
   void toggleValue(String value, bool toggle) {
-    setState(() {
-      toggle ? _selected.add(value) : _selected.remove(value);
-    });
+    toggle ? _selected.add(value) : _selected.remove(value);
+    setState(() => _selected);
+    _onChanged(_selected);
   }
 
   Widget get checkboxList {
@@ -45,7 +53,6 @@ class _CheckboxFieldState extends State<CheckboxField> {
         value: checked,
         onChanged: (bool newValue) {
           toggleValue(value, newValue);
-          _onChanged();
         },
       ));
     }

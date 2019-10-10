@@ -56,7 +56,6 @@ class PepsHomePage extends StatefulWidget {
 }
 
 class _PepsHomePageState extends State<PepsHomePage> {
-
   Future _loadForm;
 
   @override
@@ -76,9 +75,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
             if (snapshot.connectionState != ConnectionState.done) {
               return CircularProgressIndicator();
             }
-            var hasError = snapshot == null ||
-                snapshot.data is Exception ||
-                snapshot.data == null;
+            var hasError = snapshot == null || snapshot.data is Exception || snapshot.data == null;
             if (hasError) {
               return getErrorWidget(context);
             }
@@ -124,9 +121,8 @@ class _PepsHomePageState extends State<PepsHomePage> {
 
   Future fetchFormSchema() async {
     try {
-      return await http.get(
-          new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'),
-          headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
+      return await http
+          .get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
     } catch (e) {
       print(e);
       return e;
