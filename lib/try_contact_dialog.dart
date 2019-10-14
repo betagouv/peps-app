@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TryContactDialog extends StatefulWidget {
   final String title;
@@ -78,10 +79,9 @@ class _TryContactDialogState extends State<TryContactDialog> {
   @override
   void initState() {
     super.initState();
+    populateUserInfo();
     var now = DateTime.now();
     selectedDate = DateTime(now.year, now.month, now.day, timeFrames[0].value);
-    phoneNumber = '';
-    name = '';
     loading = false;
 
     phoneFocusNode.addListener(() {
@@ -97,6 +97,15 @@ class _TryContactDialogState extends State<TryContactDialog> {
     });
   }
 
+  populateUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      phoneNumber = prefs.getString('phoneNumber') ?? '';
+      name = prefs.getString('name') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -108,6 +117,16 @@ class _TryContactDialogState extends State<TryContactDialog> {
           )
         ],
       );
+    }
+
+    phoneTextController.text = phoneNumber;
+    nameTextController.text = name;
+
+    if (phoneFocusNode.hasFocus) {
+      phoneTextController.selection = TextSelection(baseOffset:0, extentOffset:phoneTextController.text.length);
+    }
+    if (nameFocusNode.hasFocus) {
+      nameTextController.selection = TextSelection(baseOffset:0, extentOffset:nameTextController.text.length);
     }
 
     TextField nameTextField = TextField(
@@ -276,7 +295,15 @@ class _TryContactDialogState extends State<TryContactDialog> {
 
   _onConfirmPressed() async {
     setState(() => loading = true);
-    var response = await createTask(nameTextController.text, phoneTextController.text, selectedDate.toIso8601String());
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var name = nameTextController.text;
+    var phoneNumber = phoneTextController.text;
+
+    prefs.setString('name', name);
+    prefs.setString('phoneNumber', phoneNumber);
+
+    var response = await createTask(name, phoneNumber, selectedDate.toIso8601String());
     if (response.statusCode >= 200 && response.statusCode < 300) {
       showDialog(
         context: context,
