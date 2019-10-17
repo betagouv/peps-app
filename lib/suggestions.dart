@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:app/suggestion_card.dart';
+import 'package:app/utils/datamanager.dart';
 
 class Suggestions extends StatefulWidget {
   final Map formResults;
@@ -97,15 +99,26 @@ class _SuggestionsState extends State<Suggestions> {
         child: new FutureBuilder(
           future: _loadSuggestions,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              final jsonBody = jsonDecode(utf8.decode(snapshot.data.bodyBytes));
-              final suggestions = jsonBody['suggestions'];
-              return ListView(
-                children: getSuggestionWidgets(suggestions, context),
-              );
-            } else {
+            if (snapshot.connectionState != ConnectionState.done) {
               return CircularProgressIndicator();
             }
+
+            if (snapshot.hasError) {
+              return ConnectionErrorWidget(
+                message: 'Oops ! Une erreur de connexion est survenue lors de la récuperation des suggestions',
+                retryFunction: () {
+                  setState(() {
+                    _assignFuture();
+                  });
+                },
+              );
+            }
+
+            final jsonBody = jsonDecode(utf8.decode(snapshot.data.bodyBytes));
+            final suggestions = jsonBody['suggestions'];
+            return ListView(
+              children: getSuggestionWidgets(suggestions, context),
+            );
           },
         ),
       ),

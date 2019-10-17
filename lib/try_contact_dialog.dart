@@ -337,7 +337,7 @@ class _TryContactDialogState extends State<TryContactDialog> {
 
   Widget _getFailBuilder(BuildContext context, http.Response response) {
     return AlertDialog(
-      title: Text('Oops !'),
+      title: Text('🙁 Oops !'),
       content: Text('Une erreur est survenue lors de la prise de rendez-vous.'),
       actions: <Widget>[
         FlatButton(

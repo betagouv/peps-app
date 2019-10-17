@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -60,7 +61,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
 
   @override
   void initState() {
-    _loadForm = fetchFormSchema();
+    _assignFuture();
     super.initState();
   }
 
@@ -75,9 +76,16 @@ class _PepsHomePageState extends State<PepsHomePage> {
             if (snapshot.connectionState != ConnectionState.done) {
               return CircularProgressIndicator();
             }
-            var hasError = snapshot == null || snapshot.data is Exception || snapshot.data == null;
+            var hasError = snapshot.hasError || snapshot == null || snapshot.data is Exception || snapshot.data == null;
             if (hasError) {
-              return getErrorWidget(context);
+              return ConnectionErrorWidget(
+                message: 'Oops ! Une erreur de connexion est survenue',
+                retryFunction: () {
+                  setState(() {
+                    _assignFuture();
+                  });
+                },
+              );
             }
 
             final jsonBody = jsonDecode(snapshot.data.body);
@@ -94,38 +102,8 @@ class _PepsHomePageState extends State<PepsHomePage> {
     );
   }
 
-  Widget getErrorWidget(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
-      child: Column(
-        children: <Widget>[
-          Icon(
-            Icons.signal_wifi_off,
-            size: 50,
-            color: Colors.grey[400],
-          ),
-          Padding(
-            child: Text('Oops ! Une erreur de connexion est survenue'),
-            padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
-          ),
-          RaisedButton(
-            child: Text('Ressayer'),
-            onPressed: () => setState(() {
-              _loadForm = fetchFormSchema();
-            }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future fetchFormSchema() async {
-    try {
-      return await http
-          .get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
-    } catch (e) {
-      print(e);
-      return e;
-    }
+  void _assignFuture() {
+    _loadForm = http
+        .get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
   }
 }
