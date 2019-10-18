@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/utils/phone_formatter.dart';
 import 'package:flutter/services.dart';
@@ -13,12 +15,16 @@ class TryContactDialog extends StatefulWidget {
   final String body;
   final Map answers;
   final String practiceId;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
-  TryContactDialog({this.title, this.body, this.answers, this.practiceId})
+  TryContactDialog({this.title, this.body, this.answers, this.practiceId, this.analytics, this.observer})
       : assert(title != null),
         assert(body != null),
         assert(answers != null),
-        assert(practiceId != null);
+        assert(practiceId != null),
+        assert(analytics != null),
+        assert(observer != null);
 
   Future createTask(String name, String phoneNumber, String datetime) async {
     return await http.post(
@@ -41,7 +47,7 @@ class TryContactDialog extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _TryContactDialogState(title: title, body: body, createTask: createTask);
+    return _TryContactDialogState(title: title, body: body, createTask: createTask, analytics: analytics, observer: observer);
   }
 }
 
@@ -50,6 +56,8 @@ class _TryContactDialogState extends State<TryContactDialog> {
   String timeFrame;
   String phoneNumber;
   String name;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
   bool loading;
 
@@ -71,10 +79,12 @@ class _TryContactDialogState extends State<TryContactDialog> {
     DropdownMenuItem<int>(value: 17, child: Text('Soir')),
   ];
 
-  _TryContactDialogState({this.title, this.body, this.createTask})
+  _TryContactDialogState({this.title, this.body, this.createTask, this.analytics, this.observer})
       : assert(title != null),
         assert(body != null),
-        assert(createTask != null);
+        assert(createTask != null),
+        assert(analytics != null),
+        assert(observer != null);
 
   @override
   void initState() {
@@ -319,6 +329,14 @@ class _TryContactDialogState extends State<TryContactDialog> {
   }
 
   Widget _getSuccessBuilder(BuildContext context) {
+
+    analytics.logEvent(
+      name: 'contact_request_sent',
+      parameters: <String, dynamic>{
+        'title': title,
+      },
+    );
+
     return AlertDialog(
       title: Text('👍 C\'est noté'),
       content: Text('Notre équipe vous contactera pour faciliter la mise en place.'),
@@ -327,7 +345,7 @@ class _TryContactDialogState extends State<TryContactDialog> {
           child: Text('OK'),
           onPressed: () {
             Navigator.of(context).popUntil((Route<dynamic> route) {
-              return route.settings.name == 'Implementation';
+              return route.settings.name == 'try_practice';
             });
           },
         )
@@ -336,6 +354,14 @@ class _TryContactDialogState extends State<TryContactDialog> {
   }
 
   Widget _getFailBuilder(BuildContext context, http.Response response) {
+
+    analytics.logEvent(
+      name: 'contact_request_failed',
+      parameters: <String, dynamic>{
+        'title': title,
+      },
+    );
+
     return AlertDialog(
       title: Text('🙁 Oops !'),
       content: Text('Une erreur est survenue lors de la prise de rendez-vous.'),

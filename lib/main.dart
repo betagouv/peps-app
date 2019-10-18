@@ -30,34 +30,47 @@ MaterialColor primarySwatch = MaterialColor(0xFFFFFFFF, {
 });
 
 class MyApp extends StatelessWidget {
-  FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Peps',
-      navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
+      navigatorObservers: <NavigatorObserver>[observer],
       theme: ThemeData(
         primarySwatch: primarySwatch,
         primaryColor: primarySwatch.shade500,
         accentColor: primarySwatch.shade700,
         fontFamily: 'Roboto',
       ),
-      home: PepsHomePage(title: 'Peps'),
+      home: PepsHomePage(
+        title: 'Peps',
+        analytics: analytics,
+        observer: observer,
+      ),
     );
   }
 }
 
 class PepsHomePage extends StatefulWidget {
-  PepsHomePage({Key key, this.title}) : super(key: key);
 
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
   final String title;
 
+  PepsHomePage({Key key, this.title, this.analytics, this.observer}) : super(key: key);
+
   @override
-  _PepsHomePageState createState() => _PepsHomePageState();
+  _PepsHomePageState createState() => _PepsHomePageState(analytics: analytics, observer: observer);
 }
 
 class _PepsHomePageState extends State<PepsHomePage> {
   Future _loadForm;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
+
+  _PepsHomePageState({this.analytics, this.observer});
 
   @override
   void initState() {
@@ -95,6 +108,8 @@ class _PepsHomePageState extends State<PepsHomePage> {
             return LandingView(
               jsonProperties: jsonProperties,
               jsonOptions: jsonOptions,
+              analytics: analytics,
+              observer: observer,
             );
           },
         ),

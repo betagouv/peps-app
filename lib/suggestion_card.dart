@@ -1,4 +1,6 @@
 import 'package:app/implementation_view.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,22 +10,36 @@ class SuggestionCard extends StatelessWidget {
   final Map answers;
   final Function hidePractice;
   final Function hidePracticeType;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
-  SuggestionCard({this.json, this.answers, this.hidePractice, this.hidePracticeType})
+  SuggestionCard({this.json, this.answers, this.hidePractice, this.hidePracticeType, this.analytics, this.observer})
       : assert(json != null),
         assert(answers != null),
         assert(hidePracticeType != null),
-        assert(hidePracticeType != null);
+        assert(hidePracticeType != null),
+        assert(analytics != null),
+        assert(observer != null);
 
   void tryPractice(BuildContext context) {
+
+    analytics.logEvent(
+      name: 'try_practice',
+      parameters: <String, dynamic>{
+        'practice': json['practice']['id'].toString(),
+      },
+    );
+
     Navigator.of(context).push(
       MaterialPageRoute(
         settings: RouteSettings(
-          name: 'Implementation',
+          name: 'try_practice',
         ),
         builder: (context) => ImplementationView(
           answers: answers,
           practiceId: json['practice']['external_id'],
+          analytics: analytics,
+          observer: observer,
         ),
       ),
     );

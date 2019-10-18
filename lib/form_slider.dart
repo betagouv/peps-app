@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/radio.dart';
@@ -12,11 +14,16 @@ class FormSlider extends StatelessWidget {
   final Map options;
   final PageController pageController;
   final List<Field> fields;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
+
   List<int> fieldStack = [0];
 
-  FormSlider({this.properties, this.options})
+  FormSlider({this.properties, this.options, this.analytics, this.observer})
       : assert(properties != null),
         assert(options != null),
+        assert(analytics != null),
+        assert(observer != null),
         pageController = PageController(initialPage: 0),
         fields = FormSlider.createFields(properties, options);
 
@@ -25,17 +32,13 @@ class FormSlider extends StatelessWidget {
 
     for (var key in properties.keys) {
       if (options[key]['type'] == 'radio') {
-        fields.add(RadioField(
-            fieldKey: key, schema: properties[key], options: options[key]));
+        fields.add(RadioField(fieldKey: key, schema: properties[key], options: options[key]));
       } else if (options[key]['type'] == 'checkbox') {
-        fields.add(CheckboxField(
-            fieldKey: key, schema: properties[key], options: options[key]));
+        fields.add(CheckboxField(fieldKey: key, schema: properties[key], options: options[key]));
       } else if (options[key]['type'] == 'array') {
-        fields.add(ArrayField(
-            fieldKey: key, schema: properties[key], options: options[key]));
+        fields.add(ArrayField(fieldKey: key, schema: properties[key], options: options[key]));
       } else if (options[key]['type'] == 'select') {
-        fields.add(SelectField(
-            fieldKey: key, schema: properties[key], options: options[key]));
+        fields.add(SelectField(fieldKey: key, schema: properties[key], options: options[key]));
       }
     }
     return fields;
@@ -45,6 +48,14 @@ class FormSlider extends StatelessWidget {
     List<Widget> children = [];
 
     var nextCallback = () {
+      var field = fields[pageController.page.toInt()];
+      analytics.logEvent(
+        name: 'form_question_next',
+        parameters: <String, dynamic> {
+          'title': field.title,
+          'answer': field.getJsonValue().values.toString(),
+        }
+      );
       var nextPage = pageController.page.toInt();
 
       /// We need to find the next page that has its dependencies satisfied
@@ -58,8 +69,7 @@ class FormSlider extends StatelessWidget {
         }
 
         if (fields[nextPage].dependenciesAreMet(answers)) {
-          pageController.animateToPage(nextPage,
-              duration: Duration(milliseconds: 200), curve: Curves.ease);
+          pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
           fieldStack.add(nextPage);
           return;
         }
@@ -81,16 +91,26 @@ class FormSlider extends StatelessWidget {
     return children;
   }
 
-  void goToSuggestions(BuildContext context) {
+  void goToSuggestions(BuildContext context) async {
+
+    await analytics.logEvent(
+      name: 'form_end',
+      parameters: <String, dynamic>{},
+    );
+
     Map formResults = {};
     for (var field in this.fields) {
       formResults.addAll(field.getJsonValue());
     }
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) => Suggestions(
-                  formResults: formResults,
-                )), (Route<dynamic> route) {
+          builder: (context) => Suggestions(
+            formResults: formResults,
+            analytics: analytics,
+            observer: observer,
+          ),
+          settings: RouteSettings(name: 'suggestions_view'),
+        ), (Route<dynamic> route) {
       return route.isFirst;
     });
   }
@@ -109,9 +129,14 @@ class FormSlider extends StatelessWidget {
 
   void goBack() {
     if (fieldStack.length > 1) {
+
+      analytics.logEvent(
+        name: 'form_question_previous',
+        parameters: <String, dynamic> {}
+      );
+
       fieldStack.removeLast();
-      pageController.animateToPage(fieldStack.last,
-          duration: Duration(milliseconds: 200), curve: Curves.ease);
+      pageController.animateToPage(fieldStack.last, duration: Duration(milliseconds: 200), curve: Curves.ease);
     }
   }
 
@@ -128,8 +153,7 @@ class _FormFieldCard extends StatefulWidget {
   final Function previousCallback;
 
   _FormFieldCardState _state;
-  _FormFieldCard(
-      {this.field, this.nextCallback, this.previousCallback, Key key})
+  _FormFieldCard({this.field, this.nextCallback, this.previousCallback, Key key})
       : assert(field != null),
         assert(nextCallback != null),
         assert(key != null),
@@ -155,8 +179,7 @@ class _FormFieldCard extends StatefulWidget {
   }
 }
 
-class _FormFieldCardState extends State<_FormFieldCard>
-    with AutomaticKeepAliveClientMixin {
+class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveClientMixin {
   bool nextEnabled = false;
 
   void toggleButton(bool active) {
@@ -181,8 +204,7 @@ class _FormFieldCardState extends State<_FormFieldCard>
       child: Icon(Icons.arrow_right),
       disabledElevation: 0,
       heroTag: 'btnN' + widget.key.toString(),
-      backgroundColor:
-          nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
+      backgroundColor: nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
     ));
     return widgets;
   }

@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form_slider.dart';
 import 'package:app/utils/clipshadowpath.dart';
@@ -5,8 +7,14 @@ import 'package:app/utils/clipshadowpath.dart';
 class LandingView extends StatefulWidget {
   final Map jsonProperties;
   final Map jsonOptions;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
-  LandingView({this.jsonProperties, this.jsonOptions});
+  LandingView({this.jsonProperties, this.jsonOptions, this.analytics, this.observer})
+      : assert(jsonProperties != null),
+        assert(jsonOptions != null),
+        assert(analytics != null),
+        assert(observer != null);
 
   @override
   State<StatefulWidget> createState() {
@@ -15,20 +23,33 @@ class LandingView extends StatefulWidget {
     return state;
   }
 
-  void startQuestionnaire(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Peps'),
-        ),
-        body: Center(
-          child: FormSlider(
-            properties: this.jsonProperties,
-            options: this.jsonOptions,
-          ),
-        ),
-      );
-    }));
+  void startQuestionnaire(BuildContext context) async {
+    await analytics.logEvent(
+      name: 'form_start',
+      parameters: <String, dynamic>{},
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Peps'),
+            ),
+            body: Center(
+              child: FormSlider(
+                properties: this.jsonProperties,
+                options: this.jsonOptions,
+                analytics: analytics,
+                observer: observer,
+              ),
+            ),
+          );
+        },
+        settings: RouteSettings(name: 'form_slider'),
+      ),
+    );
   }
 }
 
@@ -157,8 +178,7 @@ class BottomClipper extends CustomClipper<Path> {
 
     var controlPoint = new Offset(size.width / 2, size.height);
     var endPoint = new Offset(size.width, size.height - curveSize);
-    path.quadraticBezierTo(
-        controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
 
     path.lineTo(size.width, 0.0);
     path.close();

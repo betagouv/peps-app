@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:app/utils/connectionerrorwidget.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,15 +13,19 @@ class Suggestions extends StatefulWidget {
   final Map formResults;
   final List<String> practiceBlacklist;
   final List<String> typeBlacklist;
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
 
-  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const []})
+  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const [], this.analytics, this.observer})
       : assert(formResults != null),
         assert(practiceBlacklist != null),
+        assert(analytics != null),
+        assert(observer != null),
         assert(typeBlacklist != null);
 
   @override
   State<StatefulWidget> createState() {
-    var _state = _SuggestionsState();
+    var _state = _SuggestionsState(analytics: analytics, observer: observer);
     _state.formResults = formResults;
     _state.practiceBlacklist = practiceBlacklist;
     _state.typeBlacklist = typeBlacklist;
@@ -33,10 +39,25 @@ class _SuggestionsState extends State<Suggestions> {
   List<String> typeBlacklist;
   Future _loadSuggestions;
 
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
+
+  _SuggestionsState({this.analytics, this.observer})
+      : assert(analytics != null),
+        assert(observer != null);
+
   List<Widget> getSuggestionWidgets(List suggestions, BuildContext context) {
     List<Widget> widgets = List<Widget>();
 
     Function hidePracticeType = (String typeId) {
+
+      analytics.logEvent(
+        name: 'hide_practice_type',
+        parameters: <String, dynamic>{
+          'practice_type': typeId,
+        },
+      );
+
       setState(() {
         List<String> newBlacklist = [typeId];
         newBlacklist.addAll(typeBlacklist);
@@ -47,9 +68,19 @@ class _SuggestionsState extends State<Suggestions> {
     };
 
     for (var suggestion in suggestions) {
+
+      var blacklistedPracticeId = suggestion['practice']['id'].toString();
+
       Function hidePractice = () {
+        analytics.logEvent(
+          name: 'hide_practice',
+          parameters: <String, dynamic>{
+            'practice': blacklistedPracticeId,
+          },
+        );
+
         setState(() {
-          List<String> newBlacklist = [suggestion['practice']['id'].toString()];
+          List<String> newBlacklist = [blacklistedPracticeId];
           newBlacklist.addAll(practiceBlacklist);
           practiceBlacklist = newBlacklist;
           _assignFuture();
@@ -62,6 +93,8 @@ class _SuggestionsState extends State<Suggestions> {
         hidePractice: hidePractice,
         hidePracticeType: hidePracticeType,
         answers: formResults,
+        analytics: analytics,
+        observer: observer,
       ));
     }
     return widgets;
