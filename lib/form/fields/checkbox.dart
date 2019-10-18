@@ -29,6 +29,22 @@ class CheckboxField extends Field {
     var isEmpty = selected.length == 0;
     return {fieldKey: isEmpty ? null : selected.join(',')};
   }
+
+  @override
+  String getReadableAnswer() {
+    List<String> readableAnswers = <String>[];
+    if (this.selected == null) {
+      return '';
+    }
+    for (var selectedItem in this.selected) {
+      for (var item in options['dataSource']) {
+        if (item['value'] == selectedItem) {
+          readableAnswers.add(item['text']);
+        }
+      }
+    }
+    return readableAnswers.join(', ');
+  }
 }
 
 class _CheckboxFieldState extends State<CheckboxField> {

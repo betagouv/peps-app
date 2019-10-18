@@ -49,13 +49,10 @@ class FormSlider extends StatelessWidget {
 
     var nextCallback = () {
       var field = fields[pageController.page.toInt()];
-      analytics.logEvent(
-        name: 'form_question_next',
-        parameters: <String, dynamic> {
-          'title': field.title,
-          'answer': field.getJsonValue().values.toString(),
-        }
-      );
+      analytics.logEvent(name: 'form_question_next', parameters: <String, dynamic>{
+        'title': field.title,
+        'answer': field.getReadableAnswer(),
+      });
       var nextPage = pageController.page.toInt();
 
       /// We need to find the next page that has its dependencies satisfied
@@ -92,22 +89,31 @@ class FormSlider extends StatelessWidget {
   }
 
   void goToSuggestions(BuildContext context) async {
-
     await analytics.logEvent(
       name: 'form_end',
       parameters: <String, dynamic>{},
     );
 
     Map formResults = {};
+    List<Map<String, String>> readableAnswers = [];
+
     for (var field in this.fields) {
       formResults.addAll(field.getJsonValue());
+      if (field.getReadableAnswer() != '') {
+        readableAnswers.add({
+          'title': field.title.toString(),
+          'answer': field.getReadableAnswer().toString(),
+        });
+      }
     }
+
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => Suggestions(
             formResults: formResults,
             analytics: analytics,
             observer: observer,
+            readableAnswers: readableAnswers,
           ),
           settings: RouteSettings(name: 'suggestions_view'),
         ), (Route<dynamic> route) {
@@ -129,11 +135,7 @@ class FormSlider extends StatelessWidget {
 
   void goBack() {
     if (fieldStack.length > 1) {
-
-      analytics.logEvent(
-        name: 'form_question_previous',
-        parameters: <String, dynamic> {}
-      );
+      analytics.logEvent(name: 'form_question_previous', parameters: <String, dynamic>{});
 
       fieldStack.removeLast();
       pageController.animateToPage(fieldStack.last, duration: Duration(milliseconds: 200), curve: Curves.ease);

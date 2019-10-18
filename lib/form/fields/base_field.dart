@@ -15,6 +15,8 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
 
   Map getJsonValue();
 
+  String getReadableAnswer();
+
   /// Some fields have dependencies to other answers. This function
   /// takes a JSON object of form answers and determines if the current
   /// field has its dependencies fulfilled from these answers.

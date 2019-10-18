@@ -25,6 +25,18 @@ class SelectField extends Field {
   Map getJsonValue() {
     return {fieldKey: this.selected};
   }
+
+  @override
+  String getReadableAnswer() {
+    if (this.selected != null) {
+      for (var item in options['dataSource']) {
+        if(item['value'] == this.selected) {
+          return item['text'].toString();
+        }
+      }
+    }
+    return '';
+  }
 }
 
 class _SelectFieldState extends State<SelectField> {

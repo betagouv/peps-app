@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 
 class ImplementationView extends StatefulWidget {
-  final Map answers;
+  final List<Map<String, String>> answers;
   final String practiceId;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;

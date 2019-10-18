@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TryContactDialog extends StatefulWidget {
   final String title;
   final String body;
-  final Map answers;
+  final List<Map<String, String>> answers;
   final String practiceId;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
@@ -27,10 +27,17 @@ class TryContactDialog extends StatefulWidget {
         assert(observer != null);
 
   Future createTask(String name, String phoneNumber, String datetime) async {
+
+    var _answers = '';
+
+    for (var item in answers) {
+      _answers += (item['title'] + '\n' + item['answer'] + '\n\n');
+    }
+
     return await http.post(
       new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/sendTask'),
       body: jsonEncode({
-        'answers': answers,
+        'answers': _answers,
         'email': '',
         'name': name,
         'phone_number': phoneNumber,

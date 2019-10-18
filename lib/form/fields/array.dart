@@ -33,6 +33,23 @@ class ArrayField extends Field {
   Map getJsonValue() {
     return {fieldKey: this.selected};
   }
+
+  @override
+  String getReadableAnswer() {
+    var dataSource = options['items']['dataSource'];
+    List<String> readableAnswers = <String>[];
+    if (this.selected == null) {
+      return '';
+    }
+    for (var selectedItem in this.selected) {
+      for (var item in dataSource) {
+        if (item['value'] == selectedItem) {
+          readableAnswers.add(item['text']);
+        }
+      }
+    }
+    return readableAnswers.join(', ');
+  }
 }
 
 class _ArrayFieldState extends State<ArrayField> {

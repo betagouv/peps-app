@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SuggestionCard extends StatelessWidget {
   final Map json;
-  final Map answers;
+  final List<Map<String, String>> answers;
   final Function hidePractice;
   final Function hidePracticeType;
   final FirebaseAnalyticsObserver observer;

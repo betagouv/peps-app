@@ -7,17 +7,18 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:app/suggestion_card.dart';
-import 'package:app/utils/datamanager.dart';
 
 class Suggestions extends StatefulWidget {
   final Map formResults;
+  final List<Map<String, String>> readableAnswers;
   final List<String> practiceBlacklist;
   final List<String> typeBlacklist;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const [], this.analytics, this.observer})
+  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const [], this.analytics, this.observer, this.readableAnswers})
       : assert(formResults != null),
+        assert(readableAnswers != null),
         assert(practiceBlacklist != null),
         assert(analytics != null),
         assert(observer != null),
@@ -26,7 +27,7 @@ class Suggestions extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     var _state = _SuggestionsState(analytics: analytics, observer: observer);
-    _state.formResults = formResults;
+    _state.readableAnswers = readableAnswers;
     _state.practiceBlacklist = practiceBlacklist;
     _state.typeBlacklist = typeBlacklist;
     return _state;
@@ -34,7 +35,7 @@ class Suggestions extends StatefulWidget {
 }
 
 class _SuggestionsState extends State<Suggestions> {
-  Map formResults;
+  List<Map<String, String>> readableAnswers;
   List<String> practiceBlacklist;
   List<String> typeBlacklist;
   Future _loadSuggestions;
@@ -92,7 +93,7 @@ class _SuggestionsState extends State<Suggestions> {
         json: suggestion,
         hidePractice: hidePractice,
         hidePracticeType: hidePracticeType,
-        answers: formResults,
+        answers: readableAnswers,
         analytics: analytics,
         observer: observer,
       ));
@@ -110,7 +111,7 @@ class _SuggestionsState extends State<Suggestions> {
     _loadSuggestions = http.post(
       new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/calculateRankings'),
       body: jsonEncode({
-        'answers': this.formResults,
+        'answers': widget.formResults,
         'practice_blacklist': this.practiceBlacklist,
         'type_blacklist': this.typeBlacklist,
       }),

@@ -25,6 +25,21 @@ class RadioField extends Field {
   Map getJsonValue() {
     return {fieldKey: this.selected};
   }
+
+  @override
+  String getReadableAnswer() {
+    var dataSource = options.containsKey('dataSource')
+        ? options['dataSource']
+        : schema['enum'].map((x) => {'text': x, 'value': x});
+    if (this.selected != null) {
+      for (var item in dataSource) {
+        if(item['value'] == this.selected) {
+          return item['text'].toString();
+        }
+      }
+    }
+    return '';
+  }
 }
 
 class _RadioFieldState extends State<RadioField> {
