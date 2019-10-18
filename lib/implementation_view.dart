@@ -18,17 +18,11 @@ class ImplementationView extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _ImplementationViewState(analytics: analytics, observer: observer);
+    return _ImplementationViewState();
   }
 }
 
 class _ImplementationViewState extends State<ImplementationView> {
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
-
-  _ImplementationViewState({this.analytics, this.observer})
-      : assert(analytics != null),
-        assert(observer != null);
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +57,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                 subtitle: Text('Mettez-vous en relation avec un expert dans le sujet'),
                 isThreeLine: true,
                 onTap: () {
-                  analytics.logEvent(
+                  widget.analytics.logEvent(
                     name: 'try_conseiller',
                     parameters: <String, dynamic>{
                       'practice_type': widget.practiceId,
@@ -84,7 +78,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                 subtitle: Text('Renseignez-vous sur les options pour le matériel nécessaire'),
                 isThreeLine: true,
                 onTap: () {
-                  analytics.logEvent(
+                  widget.analytics.logEvent(
                     name: 'try_get_material',
                     parameters: <String, dynamic>{
                       'practice_type': widget.practiceId,
@@ -106,7 +100,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                 subtitle: Text('Partagez le retour d\'expérience d\'un agriculteur ayant mis en place la pratique'),
                 isThreeLine: true,
                 onTap: () {
-                  analytics.logEvent(
+                  widget.analytics.logEvent(
                     name: 'try_speak_farmer',
                     parameters: <String, dynamic>{
                       'practice_type': widget.practiceId,
@@ -127,7 +121,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                 trailing: Icon(Icons.keyboard_arrow_right),
                 isThreeLine: false,
                 onTap: () {
-                  analytics.logEvent(
+                  widget.analytics.logEvent(
                     name: 'try_other_question',
                     parameters: <String, dynamic>{
                       'practice_type': widget.practiceId,
@@ -148,7 +142,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                 trailing: Icon(Icons.keyboard_arrow_right),
                 isThreeLine: false,
                 onTap: () {
-                  analytics.logEvent(
+                  widget.analytics.logEvent(
                     name: 'try_no_help_needed',
                     parameters: <String, dynamic>{
                       'practice_type': widget.practiceId,
@@ -164,7 +158,7 @@ class _ImplementationViewState extends State<ImplementationView> {
 
   openDialog(BuildContext context, String title, String body) {
 
-    analytics.logEvent(
+    widget.analytics.logEvent(
       name: 'contact_form_open',
       parameters: <String, dynamic>{
         'practice_type': widget.practiceId,
@@ -180,8 +174,8 @@ class _ImplementationViewState extends State<ImplementationView> {
           body: body,
           answers: widget.answers,
           practiceId: widget.practiceId,
-          analytics: analytics,
-          observer: observer,
+          analytics: widget.analytics,
+          observer: widget.observer,
         );
       },
     );

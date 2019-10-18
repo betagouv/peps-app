@@ -62,15 +62,11 @@ class PepsHomePage extends StatefulWidget {
   PepsHomePage({Key key, this.title, this.analytics, this.observer}) : super(key: key);
 
   @override
-  _PepsHomePageState createState() => _PepsHomePageState(analytics: analytics, observer: observer);
+  _PepsHomePageState createState() => _PepsHomePageState();
 }
 
 class _PepsHomePageState extends State<PepsHomePage> {
   Future _loadForm;
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
-
-  _PepsHomePageState({this.analytics, this.observer});
 
   @override
   void initState() {
@@ -108,8 +104,8 @@ class _PepsHomePageState extends State<PepsHomePage> {
             return LandingView(
               jsonProperties: jsonProperties,
               jsonOptions: jsonOptions,
-              analytics: analytics,
-              observer: observer,
+              analytics: widget.analytics,
+              observer: widget.observer,
             );
           },
         ),

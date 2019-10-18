@@ -54,7 +54,7 @@ class TryContactDialog extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _TryContactDialogState(title: title, body: body, createTask: createTask, analytics: analytics, observer: observer);
+    return _TryContactDialogState(title: title, body: body, createTask: createTask);
   }
 }
 
@@ -63,8 +63,6 @@ class _TryContactDialogState extends State<TryContactDialog> {
   String timeFrame;
   String phoneNumber;
   String name;
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
 
   bool loading;
 
@@ -86,12 +84,10 @@ class _TryContactDialogState extends State<TryContactDialog> {
     DropdownMenuItem<int>(value: 17, child: Text('Soir')),
   ];
 
-  _TryContactDialogState({this.title, this.body, this.createTask, this.analytics, this.observer})
+  _TryContactDialogState({this.title, this.body, this.createTask})
       : assert(title != null),
         assert(body != null),
-        assert(createTask != null),
-        assert(analytics != null),
-        assert(observer != null);
+        assert(createTask != null);
 
   @override
   void initState() {
@@ -337,7 +333,7 @@ class _TryContactDialogState extends State<TryContactDialog> {
 
   Widget _getSuccessBuilder(BuildContext context) {
 
-    analytics.logEvent(
+    widget.analytics.logEvent(
       name: 'contact_request_sent',
       parameters: <String, dynamic>{
         'title': title,
@@ -362,7 +358,7 @@ class _TryContactDialogState extends State<TryContactDialog> {
 
   Widget _getFailBuilder(BuildContext context, http.Response response) {
 
-    analytics.logEvent(
+    widget.analytics.logEvent(
       name: 'contact_request_failed',
       parameters: <String, dynamic>{
         'title': title,
