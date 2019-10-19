@@ -148,7 +148,7 @@ class _ImplementationViewState extends State<ImplementationView> {
                       'practice_type': widget.practiceId,
                     },
                   );
-                  openDialog(context, 'J\'ai tout', '');
+                  openDialog(context, 'Je teste la pratique', '🎉 Félicitations ! Si vous voulez échanger davantage sur la mise en place n\'hésitez pas à remplir les champs ci-desous.');
                 }),
           ),
         ],

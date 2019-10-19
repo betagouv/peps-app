@@ -1,8 +1,10 @@
+import 'package:app/about.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form_slider.dart';
 import 'package:app/utils/clipshadowpath.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LandingView extends StatefulWidget {
   final Map jsonProperties;
@@ -141,27 +143,43 @@ class _LandingViewState extends State<LandingView> {
         Card(
           child: ListTile(
             leading: Padding(
-              child: Icon(Icons.bookmark),
+              child: Icon(Icons.filter_vintage),
               padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
             ),
             title: Padding(
-              child: Text('Pratiques sauvegardées'),
+              child: Text('Qui sommes-nous ?'),
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  settings: RouteSettings(
+                    name: 'about',
+                  ),
+                  builder: (context) => About(),
+                ),
+              );
+            },
           ),
         ),
         Card(
           child: ListTile(
             leading: Padding(
-              child: Icon(Icons.access_time),
+              child: Icon(Icons.email),
               padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
             ),
             title: Padding(
-              child: Text('Historique'),
+              child: Text('Contacter l\'équipe'),
               padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             trailing: Icon(Icons.chevron_right),
+            onTap: () {
+              String body = 'Bonjour, je vous contacte suite à l\'utilisation de l\'app Peps...\n\n[Écrivez votre message ici]';
+              String emailAddress = 'peps@beta.gouv.fr';
+              String subject = 'Contact depuis l\'app Peps';
+              launch('mailto:$emailAddress?subject=$subject&body=$body');
+            },
           ),
         ),
       ],
