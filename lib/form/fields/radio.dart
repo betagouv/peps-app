@@ -30,7 +30,7 @@ class RadioField extends Field {
   String getReadableAnswer() {
     var dataSource = options.containsKey('dataSource')
         ? options['dataSource']
-        : schema['enum'].map((x) => {'text': x, 'value': x});
+        : schema['enum'].map((x) => {'text': x, 'value': x}).toList();
     if (this.selected != null) {
       for (var item in dataSource) {
         if(item['value'] == this.selected) {
@@ -49,9 +49,13 @@ class _RadioFieldState extends State<RadioField> {
   Widget get radioList {
     List<Widget> radioListTiles = [];
 
-    var dataSource = widget.options.containsKey('dataSource')
+    List dataSource = widget.options.containsKey('dataSource')
         ? widget.options['dataSource']
-        : widget.schema['enum'].map((x) => {'text': x, 'value': x});
+        : widget.schema['enum'].map((x) => {'text': x, 'value': x}).toList();
+
+    if (widget.options['sort'] == true) {
+      dataSource.sort((a, b) => a['text'].compareTo(b['text']));
+    }
 
     for (var item in dataSource) {
       radioListTiles.add(

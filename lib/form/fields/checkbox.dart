@@ -59,7 +59,14 @@ class _CheckboxFieldState extends State<CheckboxField> {
 
   Widget get checkboxList {
     List<Widget> checkboxList = [];
-    for (var item in widget.options['dataSource']) {
+
+    List dataSource = widget.options['dataSource'];
+
+    if (widget.options['sort'] == true) {
+      dataSource.sort((a, b) => a['text'].compareTo(b['text']));
+    }
+
+    for (var item in dataSource) {
       var text = item['text'];
       var value = item['value'];
       var checked = _selected.contains(item['value']);
