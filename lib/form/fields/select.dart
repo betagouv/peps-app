@@ -6,8 +6,7 @@ import 'package:app/searchable_list.dart';
 class SelectField extends Field {
   String selected;
 
-  SelectField({String fieldKey, Map schema, Map options})
-      : super(fieldKey: fieldKey, schema: schema, options: options);
+  SelectField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _SelectFieldState createState() {
@@ -30,7 +29,7 @@ class SelectField extends Field {
   String getReadableAnswer() {
     if (this.selected != null) {
       for (var item in options['dataSource']) {
-        if(item['value'] == this.selected) {
+        if (item['value'] == this.selected) {
           return item['text'].toString();
         }
       }
@@ -74,10 +73,7 @@ class _SelectFieldState extends State<SelectField> {
 
   @override
   Widget build(BuildContext context) {
-    String displayText = _value == null
-        ? null
-        : widget.options['dataSource']
-            .firstWhere((x) => x['value'] == _value)['text'];
+    String displayText = _value == null ? null : widget.options['dataSource'].firstWhere((x) => x['value'] == _value)['text'];
 
     return Column(
       children: <Widget>[
@@ -88,15 +84,20 @@ class _SelectFieldState extends State<SelectField> {
           ),
           padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
         ),
-        Divider(),
-        Padding(
-          child: Text(displayText == null ? 'Pas de sélection' : displayText,
-              style: TextStyle(
-                  height: 1.3,
-                  color: displayText == null ? Colors.grey : Colors.black)),
-          padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+        Container(
+          child: displayText == null
+              ? Container(height: 0)
+              : Column(
+                  children: <Widget>[
+                    Divider(),
+                    Padding(
+                      child: Text(displayText, style: TextStyle(height: 1.3, color: displayText == null ? Colors.grey : Colors.black)),
+                      padding: displayText == null ? EdgeInsets.all(0) : EdgeInsets.fromLTRB(0, 10, 0, 10),
+                    ),
+                    Divider(),
+                  ],
+                ),
         ),
-        Divider(),
         RaisedButton(
           child: Text(
             displayText == null ? 'Choisir' : 'Modifier',
