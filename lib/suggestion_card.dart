@@ -348,12 +348,12 @@ class ButtonRow extends StatelessWidget {
 
   void _blacklistPractice(BuildContext context) {
     List<Widget> widgets = List<Widget>();
-    widgets.add(_createDialogOption('Cacher cette pratique', Icons.visibility_off, hidePractice));
+    widgets.add(_createDialogOption('Recalculer sans cette pratique', Icons.visibility_off, hidePractice));
 
     for (var practiceType in practiceTypes) {
       widgets.add(
         _createDialogOption(
-          'Cacher toutes les pratiques du type ' + practiceType['display_text'],
+          'Recalculer sans aucune pratique du type "${practiceType['display_text'].toString().toLowerCase()}"',
           Icons.visibility_off,
           () => hidePracticeType(practiceType['id'].toString()),
         ),
