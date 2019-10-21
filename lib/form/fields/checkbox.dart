@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
@@ -28,6 +29,18 @@ class CheckboxField extends Field {
   Map getJsonValue() {
     var isEmpty = selected.length == 0;
     return {fieldKey: isEmpty ? null : selected.join(',')};
+  }
+
+  @override
+  void logAnswer(FirebaseAnalytics analytics) {
+    if (this.shouldLogAnswer && this.selected != null) {
+      for (var item in this.selected) {
+        analytics.logEvent(
+          name: item,
+          parameters: <String, dynamic>{},
+        );
+      }
+    }
   }
 
   @override

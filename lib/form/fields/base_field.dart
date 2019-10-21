@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class Field extends StatefulWidget with ChangeNotifier {
@@ -13,9 +15,20 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
   String get title =>
       this.schema.containsKey('title') ? this.schema['title'] : '';
 
+  /// Some fields are not needed for the backend to calculate practices,
+  /// they only serve a stats/analytics purpose (e.g., agricultural group
+  /// to which the user belongs to). These fields are marked 'logAnswer' in the
+  /// schema.
+  bool get shouldLogAnswer =>
+      this.schema.containsKey('logAnswer') && this.schema['logAnswer'] == true;
+
   Map getJsonValue();
 
   String getReadableAnswer();
+
+  /// Fields marked 'logAnswer' can log values to the analytics service used
+  /// (currently Firebase).
+  void logAnswer(FirebaseAnalytics analytics);
 
   /// Some fields have dependencies to other answers. This function
   /// takes a JSON object of form answers and determines if the current

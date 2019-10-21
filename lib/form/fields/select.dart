@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
@@ -35,6 +36,16 @@ class SelectField extends Field {
       }
     }
     return '';
+  }
+
+  @override
+  void logAnswer(FirebaseAnalytics analytics) {
+    if (this.shouldLogAnswer && this.selected != null && this.selected != '') {
+      analytics.logEvent(
+        name: this.selected,
+        parameters: <String, dynamic>{},
+      );
+    }
   }
 }
 

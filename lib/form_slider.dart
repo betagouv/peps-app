@@ -88,8 +88,8 @@ class FormSlider extends StatelessWidget {
     return children;
   }
 
-  void goToSuggestions(BuildContext context) async {
-    await analytics.logEvent(
+  void goToSuggestions(BuildContext context) {
+    analytics.logEvent(
       name: 'form_end',
       parameters: <String, dynamic>{},
     );
@@ -98,6 +98,11 @@ class FormSlider extends StatelessWidget {
     List<Map<String, String>> readableAnswers = [];
 
     for (var field in this.fields) {
+
+      if (field.shouldLogAnswer) {
+        field.logAnswer(this.analytics);
+      }
+
       formResults.addAll(field.getJsonValue());
       if (field.getReadableAnswer() != '') {
         readableAnswers.add({
