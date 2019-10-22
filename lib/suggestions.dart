@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/feedback_dialog.dart';
 import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:app/suggestion_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Suggestions extends StatefulWidget {
   final Map formResults;
@@ -121,6 +123,22 @@ class _SuggestionsState extends State<Suggestions> {
     );
   }
 
+  void showContactDialog(BuildContext context) async {
+    var key = 'feedbackAsked';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var hasBeenAsked = prefs.containsKey(key) && prefs.getBool(key);
+    if (!hasBeenAsked) {
+      prefs.setBool(key, true);
+      showDialog(
+        context: context,
+        builder: (context) => FeedbackDialog(
+          answers: readableAnswers,
+          analytics: analytics,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
@@ -158,30 +176,31 @@ class _SuggestionsState extends State<Suggestions> {
       appBar: appBar,
       body: Center(
         child: new FutureBuilder(
-          future: _loadSuggestions,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return CircularProgressIndicator();
-            }
+            future: _loadSuggestions,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return CircularProgressIndicator();
+              }
 
-            if (snapshot.hasError) {
-              return ConnectionErrorWidget(
-                message: 'Oops ! Une erreur de connexion est survenue lors de la récuperation des suggestions',
-                retryFunction: () {
-                  setState(() {
-                    _assignFuture();
-                  });
-                },
+              if (snapshot.hasError) {
+                return ConnectionErrorWidget(
+                  message: 'Oops ! Une erreur de connexion est survenue lors de la récuperation des suggestions',
+                  retryFunction: () {
+                    setState(() {
+                      _assignFuture();
+                    });
+                  },
+                );
+              }
+
+              final jsonBody = jsonDecode(utf8.decode(snapshot.data.bodyBytes));
+              final suggestions = jsonBody['suggestions'];
+              showContactDialog(context);
+
+              return ListView(
+                children: getSuggestionWidgets(suggestions, context),
               );
-            }
-
-            final jsonBody = jsonDecode(utf8.decode(snapshot.data.bodyBytes));
-            final suggestions = jsonBody['suggestions'];
-            return ListView(
-              children: getSuggestionWidgets(suggestions, context),
-            );
-          },
-        ),
+            }),
       ),
     );
   }
