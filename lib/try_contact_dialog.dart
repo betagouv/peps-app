@@ -61,8 +61,6 @@ class TryContactDialog extends StatefulWidget {
 class _TryContactDialogState extends State<TryContactDialog> {
   DateTime selectedDate;
   String timeFrame;
-  String phoneNumber;
-  String name;
 
   bool loading;
 
@@ -97,25 +95,14 @@ class _TryContactDialogState extends State<TryContactDialog> {
     selectedDate = DateTime(now.year, now.month, now.day, timeFrames[0].value);
     loading = false;
 
-    phoneFocusNode.addListener(() {
-      if (!phoneFocusNode.hasFocus) {
-        setState(() => phoneNumber = phoneTextController.text);
-      }
-    });
-
-    nameFocusNode.addListener(() {
-      if (!nameFocusNode.hasFocus) {
-        setState(() => name = nameTextController.text);
-      }
-    });
   }
 
   populateUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      phoneNumber = prefs.getString('phoneNumber') ?? '';
-      name = prefs.getString('name') ?? '';
+      phoneTextController.text = prefs.getString('phoneNumber') ?? '';
+      nameTextController.text = prefs.getString('name') ?? '';
     });
   }
 
@@ -131,9 +118,6 @@ class _TryContactDialogState extends State<TryContactDialog> {
         ],
       );
     }
-
-    phoneTextController.text = phoneNumber;
-    nameTextController.text = name;
 
     if (phoneFocusNode.hasFocus) {
       phoneTextController.selection = TextSelection(baseOffset:0, extentOffset:phoneTextController.text.length);
