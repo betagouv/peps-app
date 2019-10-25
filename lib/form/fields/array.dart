@@ -10,6 +10,7 @@ import 'package:app/searchable_list.dart';
 class ArrayField extends Field {
 
   List<String> selected;
+  PersistentBottomSheetController bottomSheetController;
 
   ArrayField({String fieldKey, Map schema, Map options})
       : super(fieldKey: fieldKey, schema: schema, options: options);
@@ -50,6 +51,16 @@ class ArrayField extends Field {
       }
     }
     return readableAnswers.join(', ');
+  }
+
+  @override
+  bool canGoBack() {
+    if (bottomSheetController != null) {
+      bottomSheetController.close();
+      bottomSheetController = null;
+      return false;
+    }
+    return super.canGoBack();
   }
 
   @override
@@ -131,7 +142,7 @@ class _ArrayFieldState extends State<ArrayField> {
       );
     }
 
-    showBottomSheet(
+    widget.bottomSheetController = showBottomSheet(
         context: context,
         builder: (context) {
           return SearchableList(tiles: widgets);

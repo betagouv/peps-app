@@ -6,6 +6,7 @@ import 'package:app/searchable_list.dart';
 
 class SelectField extends Field {
   String selected;
+  PersistentBottomSheetController bottomSheetController;
 
   SelectField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
 
@@ -36,6 +37,16 @@ class SelectField extends Field {
       }
     }
     return '';
+  }
+
+  @override
+  bool canGoBack() {
+    if (bottomSheetController != null) {
+      bottomSheetController.close();
+      bottomSheetController = null;
+      return false;
+    }
+    return super.canGoBack();
   }
 
   @override
@@ -75,7 +86,7 @@ class _SelectFieldState extends State<SelectField> {
       );
     }
 
-    showBottomSheet(
+    widget.bottomSheetController = showBottomSheet(
         context: context,
         builder: (context) {
           return SearchableList(tiles: widgets);

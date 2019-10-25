@@ -1,5 +1,4 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class Field extends StatefulWidget with ChangeNotifier {
@@ -21,6 +20,14 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
   /// schema.
   bool get shouldLogAnswer =>
       this.schema.containsKey('logAnswer') && this.schema['logAnswer'] == true;
+
+  /// Some fields might add bottomsheets or other views which will need to
+  /// be dismissible with the app bar back button. The form slider will ask
+  /// if it is OK for the field to bo back. By default the answer will be True,
+  /// but each field can decide to block the back button to close other screens.
+  bool canGoBack() {
+    return true;
+  }
 
   Map getJsonValue();
 

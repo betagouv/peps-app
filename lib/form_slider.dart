@@ -139,6 +139,9 @@ class FormSlider extends StatelessWidget {
   }
 
   void goBack() {
+    if (!fields[fieldStack.last].canGoBack()) {
+      return;
+    }
     if (fieldStack.length > 1) {
       analytics.logEvent(name: 'form_question_previous', parameters: <String, dynamic>{});
 
