@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/landingview.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_analytics/observer.dart';
 
 Future main() async {
   await DotEnv().load();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   Crashlytics.instance.enableInDevMode = false;
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   runApp(MyApp());
