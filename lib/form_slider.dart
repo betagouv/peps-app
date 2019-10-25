@@ -156,8 +156,8 @@ class FormSlider extends StatelessWidget {
 
 class _FormFieldCard extends StatefulWidget {
   final Field field;
-  final Function nextCallback;
-  final Function previousCallback;
+  final void Function() nextCallback;
+  final void Function() previousCallback;
 
   _FormFieldCardState _state;
   _FormFieldCard({this.field, this.nextCallback, this.previousCallback, Key key})

@@ -8,8 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 class SuggestionCard extends StatelessWidget {
   final Map json;
   final List<Map<String, String>> answers;
-  final Function hidePractice;
-  final Function hidePracticeType;
+  final void Function(String typeId) hidePractice;
+  final void Function(String typeId) hidePracticeType;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
@@ -307,9 +307,9 @@ class ResourceLink extends StatelessWidget {
 /// card.
 class ButtonRow extends StatelessWidget {
   final double iconSize = 35.0;
-  final Function hidePractice;
-  final Function hidePracticeType;
-  final Function tryPractice;
+  final void Function(String typeId) hidePractice;
+  final void Function(String typeId) hidePracticeType;
+  final void Function(BuildContext context) tryPractice;
   final List<Map> practiceTypes;
 
   ButtonRow({

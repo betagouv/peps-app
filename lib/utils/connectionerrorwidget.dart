@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 class ConnectionErrorWidget extends StatelessWidget {
   final String message;
-  final Function retryFunction;
+  final void Function() retryFunction;
 
   ConnectionErrorWidget({this.message, this.retryFunction});
 

@@ -182,9 +182,9 @@ class _ArrayFieldState extends State<ArrayField> {
 /// the item from the list.
 class ListItem extends StatelessWidget {
   final String text;
-  final Function swapUp;
-  final Function swapDown;
-  final Function onDismissed;
+  final void Function() swapUp;
+  final void Function() swapDown;
+  final void Function(DismissDirection direction) onDismissed;
   final bool showDivider;
 
   ListItem(
@@ -211,8 +211,14 @@ class ListItem extends StatelessWidget {
           ),
           Padding(
               child:
-                  IconButton(icon: Icon(Icons.arrow_upward), onPressed: swapUp),
+                  IconButton(icon: Icon(Icons.delete_forever), onPressed: () { 
+                    this.onDismissed(DismissDirection.horizontal);
+                  }),
               padding: EdgeInsets.fromLTRB(16, 0, 4, 0)),
+          Padding(
+              child:
+                  IconButton(icon: Icon(Icons.arrow_upward), onPressed: swapUp),
+              padding: EdgeInsets.fromLTRB(4, 0, 4, 0)),
           Padding(
               child: IconButton(
                   icon: Icon(Icons.arrow_downward), onPressed: swapDown),

@@ -66,7 +66,7 @@ class _TryContactDialogState extends State<TryContactDialog> {
 
   final String title;
   final String body;
-  final Function createTask;
+  final Future Function(String name, String phoneNumber, String datetime) createTask;
   final DateTime today = DateTime.now();
 
   final FocusNode phoneFocusNode = FocusNode();
