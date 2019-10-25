@@ -125,9 +125,12 @@ class _FormSliderState extends State<FormSlider> {
 
     var nextCallback = () async {
       var field = widget.fields[widget.pageController.page.toInt()];
+      String fieldTitle = field.title.length >= 100 ? field.title.substring(0, 99) : field.title;
+      String fieldValue = field.getReadableAnswer();
+      fieldValue = fieldValue.length >= 100 ? fieldValue.substring(0, 99) : fieldValue;
       widget.analytics.logEvent(name: 'form_question_next', parameters: <String, dynamic>{
-        'title': field.title,
-        'answer': field.getReadableAnswer(),
+        'title': fieldTitle,
+        'answer': fieldValue,
       });
       var nextPage = widget.pageController.page.toInt();
 
