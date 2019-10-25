@@ -1,3 +1,4 @@
+import 'package:app/form_field_card.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/widgets.dart';
@@ -9,15 +10,13 @@ import 'package:app/form/fields/select.dart';
 import 'package:app/suggestions.dart';
 import 'package:app/form/fields/base_field.dart';
 
-class FormSlider extends StatelessWidget {
+class FormSlider extends StatefulWidget {
   final Map properties;
   final Map options;
   final PageController pageController;
   final List<Field> fields;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
-
-  List<int> fieldStack = [0];
 
   FormSlider({this.properties, this.options, this.analytics, this.observer})
       : assert(properties != null),
@@ -44,56 +43,6 @@ class FormSlider extends StatelessWidget {
     return fields;
   }
 
-  List<Widget> _getChildren(BuildContext context) {
-    List<Widget> children = [];
-
-    var nextCallback = () async {
-      var field = fields[pageController.page.toInt()];
-      analytics.logEvent(name: 'form_question_next', parameters: <String, dynamic>{
-        'title': field.title,
-        'answer': field.getReadableAnswer(),
-      });
-      var nextPage = pageController.page.toInt();
-
-      /// We need to find the next page that has its dependencies satisfied
-      /// from the answers provided so far.
-      while (nextPage < fields.length - 1) {
-        nextPage += 1;
-
-        var answers = {};
-        for (var i = 0; i <= pageController.page.toInt(); i++) {
-          answers.addAll(fields[i].getJsonValue());
-        }
-
-        if(!fields[nextPage].dependenciesAreMet(answers)) {
-          continue;
-        }
-
-        if(fields[nextPage].shouldLogAnswer && (await fields[nextPage].hasLoggedAnswer())) {
-          continue;
-        }
-
-        pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
-        fieldStack.add(nextPage);
-        return;
-      }
-
-      /// We reached the end of the pages, we need to go to the suggestions page.
-      goToSuggestions(context);
-    };
-
-    for (var field in this.fields) {
-      children.add(_FormFieldCard(
-        field: field,
-        nextCallback: nextCallback,
-        previousCallback: field == this.fields.first ? null : this.goBack,
-        key: PageStorageKey('Page' + this.fields.indexOf(field).toString()),
-      ));
-    }
-
-    return children;
-  }
-
   void goToSuggestions(BuildContext context) {
     analytics.logEvent(
       name: 'form_end',
@@ -104,7 +53,6 @@ class FormSlider extends StatelessWidget {
     List<Map<String, String>> readableAnswers = [];
 
     for (var field in this.fields) {
-
       if (field.shouldLogAnswer) {
         field.logAnswer(this.analytics);
       }
@@ -133,27 +81,24 @@ class FormSlider extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState() {
+    return _FormSliderState();
+  }
+}
+
+class _FormSliderState extends State<FormSlider> {
+  List<int> fieldStack = [0];
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: PageView(
         physics: NeverScrollableScrollPhysics(),
-        controller: pageController,
+        controller: widget.pageController,
         children: _getChildren(context),
       ),
     );
-  }
-
-  void goBack() {
-    if (!fields[fieldStack.last].canGoBack()) {
-      return;
-    }
-    if (fieldStack.length > 1) {
-      analytics.logEvent(name: 'form_question_previous', parameters: <String, dynamic>{});
-
-      fieldStack.removeLast();
-      pageController.animateToPage(fieldStack.last, duration: Duration(milliseconds: 200), curve: Curves.ease);
-    }
   }
 
   Future<bool> _onWillPop() {
@@ -161,95 +106,68 @@ class FormSlider extends StatelessWidget {
     goBack();
     return Future.value(shouldClose);
   }
-}
 
-class _FormFieldCard extends StatefulWidget {
-  final Field field;
-  final void Function() nextCallback;
-  final void Function() previousCallback;
-
-  _FormFieldCardState _state;
-  _FormFieldCard({this.field, this.nextCallback, this.previousCallback, Key key})
-      : assert(field != null),
-        assert(nextCallback != null),
-        assert(key != null),
-        super(key: key);
-
-  void onChanged() {
-    var fieldValue = field.getJsonValue();
-    var isEmpty = true;
-    for (var key in fieldValue.keys) {
-      if (fieldValue[key] != null) {
-        isEmpty = false;
-        break;
-      }
+  void goBack() {
+    if (!widget.fields[fieldStack.last].canGoBack()) {
+      return;
     }
-    _state.toggleButton(!isEmpty);
+    if (fieldStack.length > 1) {
+      widget.analytics.logEvent(name: 'form_question_previous', parameters: <String, dynamic>{});
+
+      fieldStack.removeLast();
+      setState(() => fieldStack = fieldStack);
+      widget.pageController.animateToPage(fieldStack.last, duration: Duration(milliseconds: 200), curve: Curves.ease);
+    }
   }
 
-  _FormFieldCardState createState() {
-    _state = _FormFieldCardState();
-    field.removeListener(onChanged);
-    field.addListener(onChanged);
-    return _state;
-  }
-}
+  List<Widget> _getChildren(BuildContext context) {
+    List<Widget> children = [];
 
-class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveClientMixin {
-  bool nextEnabled = false;
+    var nextCallback = () async {
+      var field = widget.fields[widget.pageController.page.toInt()];
+      widget.analytics.logEvent(name: 'form_question_next', parameters: <String, dynamic>{
+        'title': field.title,
+        'answer': field.getReadableAnswer(),
+      });
+      var nextPage = widget.pageController.page.toInt();
 
-  void toggleButton(bool active) {
-    setState(() => nextEnabled = active);
-  }
+      /// We need to find the next page that has its dependencies satisfied
+      /// from the answers provided so far.
+      while (nextPage < widget.fields.length - 1) {
+        nextPage += 1;
 
-  List<Widget> getButtons() {
-    List<Widget> widgets = List<Widget>();
-    if (widget.previousCallback != null) {
-      widgets.add(Padding(
-        child: FloatingActionButton(
-          onPressed: widget.previousCallback,
-          child: Icon(Icons.arrow_left),
-          heroTag: 'btnP' + widget.key.toString(),
-          backgroundColor: Theme.of(context).primaryColor,
-        ),
-        padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+        var answers = {};
+        for (var i = 0; i <= widget.pageController.page.toInt(); i++) {
+          answers.addAll(widget.fields[i].getJsonValue());
+        }
+
+        if (!widget.fields[nextPage].dependenciesAreMet(answers)) {
+          continue;
+        }
+
+        if (widget.fields[nextPage].shouldLogAnswer && (await widget.fields[nextPage].hasLoggedAnswer())) {
+          continue;
+        }
+
+        widget.pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        fieldStack.add(nextPage);
+        setState(() => fieldStack = fieldStack);
+        return;
+      }
+
+      /// We reached the end of the pages, we need to go to the suggestions page.
+      widget.goToSuggestions(context);
+    };
+
+    for (var field in widget.fields) {
+      children.add(FormFieldCard(
+        field: field,
+        nextCallback: nextCallback,
+        previousCallback: field == widget.fields.first ? null : this.goBack,
+        key: PageStorageKey('Page' + widget.fields.indexOf(field).toString()),
       ));
     }
-    widgets.add(FloatingActionButton(
-      onPressed: nextEnabled ? widget.nextCallback : null,
-      child: Icon(Icons.arrow_right),
-      disabledElevation: 0,
-      heroTag: 'btnN' + widget.key.toString(),
-      backgroundColor: nextEnabled ? Theme.of(context).primaryColor : Colors.grey[300],
-    ));
-    return widgets;
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return ListView(
-      padding: EdgeInsets.all(10.0),
-      children: <Widget>[
-        Card(
-          child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: widget.field,
-          ),
-        ),
-        Container(
-          child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              children: getButtons(),
-              mainAxisAlignment: MainAxisAlignment.end,
-            ),
-          ),
-        )
-      ],
-    );
+    return children;
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
