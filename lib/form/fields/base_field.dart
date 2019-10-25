@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class Field extends StatefulWidget with ChangeNotifier {
   final String fieldKey;
@@ -11,15 +12,25 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
     fontFamily: 'SourceSansPro',
   );
 
-  String get title =>
-      this.schema.containsKey('title') ? this.schema['title'] : '';
+  String get title => this.schema.containsKey('title') ? this.schema['title'] : '';
 
   /// Some fields are not needed for the backend to calculate practices,
   /// they only serve a stats/analytics purpose (e.g., agricultural group
   /// to which the user belongs to). These fields are marked 'logAnswer' in the
   /// schema.
-  bool get shouldLogAnswer =>
-      this.schema.containsKey('logAnswer') && this.schema['logAnswer'] == true;
+  bool get shouldLogAnswer => this.schema.containsKey('logAnswer') && this.schema['logAnswer'] == true;
+
+  Future<bool> hasLoggedAnswer() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = 'loggedAnswers';
+    List<String> loggedAnswers;
+
+    if (!prefs.containsKey(key)) {
+      return Future.value(false);
+    }
+    loggedAnswers = prefs.getStringList(key);
+    return Future.value(loggedAnswers.contains(this.fieldKey));
+  }
 
   /// Some fields might add bottomsheets or other views which will need to
   /// be dismissible with the app bar back button. The form slider will ask
@@ -33,9 +44,32 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
 
   String getReadableAnswer();
 
+
+
   /// Fields marked 'logAnswer' can log values to the analytics service used
-  /// (currently Firebase).
-  void logAnswer(FirebaseAnalytics analytics);
+  /// (currently Firebase). First we check if we have not already sent this,
+  /// in which case we will ask the subclass field to send to analytics.
+  void logAnswer(FirebaseAnalytics analytics) async {
+    if (!this.sendToAnalytics(analytics)) {
+      return;
+    }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = 'loggedAnswers';
+    List<String> loggedAnswers;
+
+    if (prefs.containsKey(key)) {
+      loggedAnswers = prefs.getStringList(key);
+    } else {
+      loggedAnswers = [];
+    }
+    if (!loggedAnswers.contains(this.fieldKey)) {
+      loggedAnswers.add(this.fieldKey);
+    }
+    prefs.setStringList(key, loggedAnswers);
+  }
+
+  /// This method will have to be implemented by subclasses.
+  bool sendToAnalytics(FirebaseAnalytics analytics);
 
   /// Some fields have dependencies to other answers. This function
   /// takes a JSON object of form answers and determines if the current
@@ -51,7 +85,6 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
     /// We check every dependency agains the answers provided.
     var dependencies = this.options['dependencies'];
     for (var key in dependencies.keys) {
-
       if (!answers.containsKey(key)) {
         return false;
       }

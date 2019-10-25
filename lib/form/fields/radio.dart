@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
 
 class RadioField extends Field {
-
   String selected;
 
-  RadioField({String fieldKey, Map schema, Map options})
-      : super(fieldKey: fieldKey, schema: schema, options: options);
+  RadioField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _RadioFieldState createState() {
@@ -28,23 +26,23 @@ class RadioField extends Field {
   }
 
   @override
-  void logAnswer(FirebaseAnalytics analytics) {
-    if (this.shouldLogAnswer && this.selected != null && this.selected != '') {
-      analytics.logEvent(
-        name: this.selected,
-        parameters: <String, dynamic>{},
-      );
+  bool sendToAnalytics(FirebaseAnalytics analytics) {
+    if (!this.shouldLogAnswer || this.selected == null || this.selected == '') {
+      return false;
     }
+    analytics.logEvent(
+      name: this.selected,
+      parameters: <String, dynamic>{},
+    );
+    return true;
   }
 
   @override
   String getReadableAnswer() {
-    var dataSource = options.containsKey('dataSource')
-        ? options['dataSource']
-        : schema['enum'].map((x) => {'text': x, 'value': x}).toList();
+    var dataSource = options.containsKey('dataSource') ? options['dataSource'] : schema['enum'].map((x) => {'text': x, 'value': x}).toList();
     if (this.selected != null) {
       for (var item in dataSource) {
-        if(item['value'] == this.selected) {
+        if (item['value'] == this.selected) {
           return item['text'].toString();
         }
       }
@@ -60,9 +58,8 @@ class _RadioFieldState extends State<RadioField> {
   Widget get radioList {
     List<Widget> radioListTiles = [];
 
-    List dataSource = widget.options.containsKey('dataSource')
-        ? widget.options['dataSource']
-        : widget.schema['enum'].map((x) => {'text': x, 'value': x}).toList();
+    List dataSource =
+        widget.options.containsKey('dataSource') ? widget.options['dataSource'] : widget.schema['enum'].map((x) => {'text': x, 'value': x}).toList();
 
     if (widget.options['sort'] == true) {
       dataSource.sort((a, b) => a['text'].compareTo(b['text']));

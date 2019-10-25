@@ -50,13 +50,15 @@ class SelectField extends Field {
   }
 
   @override
-  void logAnswer(FirebaseAnalytics analytics) {
-    if (this.shouldLogAnswer && this.selected != null && this.selected != '') {
-      analytics.logEvent(
-        name: this.selected,
-        parameters: <String, dynamic>{},
-      );
+  bool sendToAnalytics(FirebaseAnalytics analytics) {
+    if (!this.shouldLogAnswer || this.selected == null || this.selected == '') {
+      return false;
     }
+    analytics.logEvent(
+      name: this.selected,
+      parameters: <String, dynamic>{},
+    );
+    return true;
   }
 }
 

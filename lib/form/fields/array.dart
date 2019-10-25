@@ -8,12 +8,10 @@ import 'package:app/searchable_list.dart';
 /// elements from options (implements Alpaca's array field
 /// http://www.alpacajs.org/docs/fields/array.html).
 class ArrayField extends Field {
-
   List<String> selected;
   PersistentBottomSheetController bottomSheetController;
 
-  ArrayField({String fieldKey, Map schema, Map options})
-      : super(fieldKey: fieldKey, schema: schema, options: options);
+  ArrayField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
 
   @override
   _ArrayFieldState createState() {
@@ -64,15 +62,17 @@ class ArrayField extends Field {
   }
 
   @override
-  void logAnswer(FirebaseAnalytics analytics) {
-    if (this.shouldLogAnswer && this.selected != null) {
-      for (var item in this.selected) {
-        analytics.logEvent(
-          name: item,
-          parameters: <String, dynamic>{},
-        );
-      }
+  bool sendToAnalytics(FirebaseAnalytics analytics) {
+    if (!this.shouldLogAnswer || this.selected == null) {
+      return false;
     }
+    for (var item in this.selected) {
+      analytics.logEvent(
+        name: item,
+        parameters: <String, dynamic>{},
+      );
+    }
+    return true;
   }
 }
 
@@ -84,10 +84,7 @@ class _ArrayFieldState extends State<ArrayField> {
   /// items up and down. If we specify out-of-bounds positions
   /// the function will just ignore the request.
   void swap(int index1, int index2) {
-    if (index1 < 0 ||
-        index2 < 0 ||
-        index1 >= _selected.length ||
-        index2 >= _selected.length) {
+    if (index1 < 0 || index2 < 0 || index1 >= _selected.length || index2 >= _selected.length) {
       return;
     }
     var tmp = _selected[index1];
@@ -123,8 +120,7 @@ class _ArrayFieldState extends State<ArrayField> {
     List<SearchableListTile> widgets = List<SearchableListTile>();
 
     var dataSource = widget.options['items']['dataSource'];
-    dataSource
-        .sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
+    dataSource.sort((a, b) => a['text'].toString().compareTo(b['text'].toString()));
 
     for (var item in dataSource) {
       widgets.add(
@@ -172,8 +168,7 @@ class _ArrayFieldState extends State<ArrayField> {
               ),
               behavior: PlainScrollBehavior(),
             ),
-            padding:
-                EdgeInsets.fromLTRB(0, 0, 0, _selected.length > 0 ? 10 : 0)),
+            padding: EdgeInsets.fromLTRB(0, 0, 0, _selected.length > 0 ? 10 : 0)),
         RaisedButton(
           child: Text(
             'Ajouter une culture',
@@ -198,12 +193,7 @@ class ListItem extends StatelessWidget {
   final void Function(DismissDirection direction) onDismissed;
   final bool showDivider;
 
-  ListItem(
-      {this.text,
-      this.swapUp,
-      this.swapDown,
-      this.onDismissed,
-      this.showDivider});
+  ListItem({this.text, this.swapUp, this.swapDown, this.onDismissed, this.showDivider});
 
   @override
   Widget build(BuildContext context) {
@@ -221,19 +211,14 @@ class ListItem extends StatelessWidget {
             ),
           ),
           Padding(
-              child:
-                  IconButton(icon: Icon(Icons.delete_forever), onPressed: () { 
+              child: IconButton(
+                  icon: Icon(Icons.delete_forever),
+                  onPressed: () {
                     this.onDismissed(DismissDirection.horizontal);
                   }),
               padding: EdgeInsets.fromLTRB(16, 0, 4, 0)),
-          Padding(
-              child:
-                  IconButton(icon: Icon(Icons.arrow_upward), onPressed: swapUp),
-              padding: EdgeInsets.fromLTRB(4, 0, 4, 0)),
-          Padding(
-              child: IconButton(
-                  icon: Icon(Icons.arrow_downward), onPressed: swapDown),
-              padding: EdgeInsets.fromLTRB(4, 0, 16, 0)),
+          Padding(child: IconButton(icon: Icon(Icons.arrow_upward), onPressed: swapUp), padding: EdgeInsets.fromLTRB(4, 0, 4, 0)),
+          Padding(child: IconButton(icon: Icon(Icons.arrow_downward), onPressed: swapDown), padding: EdgeInsets.fromLTRB(4, 0, 16, 0)),
         ],
       ),
     );
@@ -246,8 +231,7 @@ class ListItem extends StatelessWidget {
 /// the user.
 class PlainScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
   }
 }

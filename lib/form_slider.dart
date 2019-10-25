@@ -47,7 +47,7 @@ class FormSlider extends StatelessWidget {
   List<Widget> _getChildren(BuildContext context) {
     List<Widget> children = [];
 
-    var nextCallback = () {
+    var nextCallback = () async {
       var field = fields[pageController.page.toInt()];
       analytics.logEvent(name: 'form_question_next', parameters: <String, dynamic>{
         'title': field.title,
@@ -65,11 +65,17 @@ class FormSlider extends StatelessWidget {
           answers.addAll(fields[i].getJsonValue());
         }
 
-        if (fields[nextPage].dependenciesAreMet(answers)) {
-          pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
-          fieldStack.add(nextPage);
-          return;
+        if(!fields[nextPage].dependenciesAreMet(answers)) {
+          continue;
         }
+
+        if(fields[nextPage].shouldLogAnswer && (await fields[nextPage].hasLoggedAnswer())) {
+          continue;
+        }
+
+        pageController.animateToPage(nextPage, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        fieldStack.add(nextPage);
+        return;
       }
 
       /// We reached the end of the pages, we need to go to the suggestions page.
@@ -221,6 +227,7 @@ class _FormFieldCardState extends State<_FormFieldCard> with AutomaticKeepAliveC
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView(
       padding: EdgeInsets.all(10.0),
       children: <Widget>[

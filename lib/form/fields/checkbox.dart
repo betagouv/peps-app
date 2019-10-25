@@ -32,15 +32,17 @@ class CheckboxField extends Field {
   }
 
   @override
-  void logAnswer(FirebaseAnalytics analytics) {
-    if (this.shouldLogAnswer && this.selected != null) {
-      for (var item in this.selected) {
-        analytics.logEvent(
-          name: item,
-          parameters: <String, dynamic>{},
-        );
-      }
+  bool sendToAnalytics(FirebaseAnalytics analytics) {
+    if (!this.shouldLogAnswer || this.selected == null) {
+      return false;
     }
+    for (var item in this.selected) {
+      analytics.logEvent(
+        name: item,
+        parameters: <String, dynamic>{},
+      );
+    }
+    return true;
   }
 
   @override
