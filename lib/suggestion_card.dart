@@ -22,7 +22,6 @@ class SuggestionCard extends StatelessWidget {
         assert(observer != null);
 
   void tryPractice(BuildContext context) {
-
     analytics.logEvent(
       name: 'try_practice',
       parameters: <String, dynamic>{
@@ -374,45 +373,59 @@ class ButtonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
       children: <Widget>[
-        Spacer(
-          flex: 1,
-        ),
-        Flexible(
-          flex: 2,
-          fit: FlexFit.tight,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(10, 0, 25, 0),
-            child: IconButton(
-              onPressed: () => _blacklistPractice(context),
-              icon: Icon(
-                Icons.delete_outline,
-                size: this.iconSize,
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ),
-        Flexible(
-          flex: 3,
-          fit: FlexFit.tight,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-            child: RaisedButton(
-              child: Text(
-                'Essayer',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+        Padding(
+          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: SizedBox(
+              width: double.infinity,
+              child: RaisedButton(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                      child: Icon(
+                        Icons.cancel,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    Text(
+                      'Recalculer sans cette pratique',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
-              ),
-              color: Theme.of(context).primaryColor,
-              onPressed: () => tryPractice(context),
-            ),
-          ),
+                onPressed: () => _blacklistPractice(context),
+              )),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: SizedBox(
+              width: double.infinity,
+              child: RaisedButton(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Essayer cette pratique',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    )
+                  ],
+                ),
+                color: Theme.of(context).primaryColor,
+                onPressed: () => tryPractice(context),
+              )),
         ),
       ],
     );
