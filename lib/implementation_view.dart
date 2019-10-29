@@ -26,12 +26,40 @@ class _ImplementationViewState extends State<ImplementationView> {
 
   @override
   Widget build(BuildContext context) {
+    var appBar = AppBar(
+      title: Text('Mise en place'),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Êtes-vous sur de vouloir quitter ?'),
+                  content: Text('En confirmant, vous reviendrez à l\'accueil.'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Revenir à l\'accueil'),
+                      onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+                    ),
+                    FlatButton(
+                      child: Text('Rester'),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        )
+      ],
+    );
+
     return Scaffold(
       key: Key('try_practice'),
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Mise en place'),
-      ),
+      appBar: appBar,
       body: ListView(
         children: <Widget>[
           Container(

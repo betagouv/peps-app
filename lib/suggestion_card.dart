@@ -396,6 +396,7 @@ class ButtonRow extends StatelessWidget {
                     ),
                   ],
                 ),
+                color: Color.fromARGB(255, 245, 245, 245),
                 onPressed: () => _blacklistPractice(context),
               )),
         ),

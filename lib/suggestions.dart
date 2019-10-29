@@ -16,7 +16,8 @@ class Suggestions extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  Suggestions({this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const [], this.analytics, this.observer, this.readableAnswers})
+  Suggestions(
+      {this.formResults, this.practiceBlacklist = const [], this.typeBlacklist = const [], this.analytics, this.observer, this.readableAnswers})
       : assert(formResults != null),
         assert(readableAnswers != null),
         assert(practiceBlacklist != null),
@@ -51,7 +52,6 @@ class _SuggestionsState extends State<Suggestions> {
     List<Widget> widgets = List<Widget>();
 
     Function hidePracticeType = (String typeId) {
-
       analytics.logEvent(
         name: 'hide_practice_type',
         parameters: <String, dynamic>{
@@ -69,7 +69,6 @@ class _SuggestionsState extends State<Suggestions> {
     };
 
     for (var suggestion in suggestions) {
-
       var blacklistedPracticeId = suggestion['practice']['id'].toString();
 
       Function hidePractice = () {
@@ -124,11 +123,39 @@ class _SuggestionsState extends State<Suggestions> {
 
   @override
   Widget build(BuildContext context) {
+    var appBar = AppBar(
+      title: Text('Résultats'),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Êtes-vous sur de vouloir quitter ?'),
+                  content: Text('En confirmant, vous reviendrez à l\'accueil.'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Revenir à l\'accueil'),
+                      onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+                    ),
+                    FlatButton(
+                      child: Text('Rester'),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        )
+      ],
+    );
+
     return Scaffold(
       backgroundColor: Colors.grey[400],
-      appBar: AppBar(
-        title: Text('Résultats'),
-      ),
+      appBar: appBar,
       body: Center(
         child: new FutureBuilder(
           future: _loadSuggestions,

@@ -56,7 +56,6 @@ class MyApp extends StatelessWidget {
 }
 
 class PepsHomePage extends StatefulWidget {
-
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
   final String title;
@@ -116,7 +115,7 @@ class _PepsHomePageState extends State<PepsHomePage> {
   }
 
   void _assignFuture() {
-    _loadForm = http
-        .get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
+    _loadForm =
+        http.get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
   }
 }

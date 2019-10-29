@@ -66,8 +66,8 @@ class FormSlider extends StatefulWidget {
       }
     }
 
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
+    Navigator.of(context).push(
+      MaterialPageRoute(
           builder: (context) => Suggestions(
             formResults: formResults,
             analytics: analytics,
@@ -75,9 +75,8 @@ class FormSlider extends StatefulWidget {
             readableAnswers: readableAnswers,
           ),
           settings: RouteSettings(name: 'suggestions_view'),
-        ), (Route<dynamic> route) {
-      return route.isFirst;
-    });
+        )
+    );
   }
 
   @override
