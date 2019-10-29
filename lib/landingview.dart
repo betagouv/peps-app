@@ -76,6 +76,7 @@ class _LandingViewState extends State<LandingView> {
       child: Container(
         height: 250,
         decoration: new BoxDecoration(
+          color: Theme.of(context).primaryColor,
           image: new DecorationImage(
             image: AssetImage('assets/bg-image.png'),
             fit: BoxFit.cover,
