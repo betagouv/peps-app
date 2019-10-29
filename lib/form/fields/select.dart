@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
 import 'package:app/searchable_list.dart';
 
+/// This key will allow us to access the state
+final key = new GlobalKey<_SelectFieldState>();
+
 class SelectField extends Field {
   String selected;
-  PersistentBottomSheetController bottomSheetController;
 
-  SelectField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
+  SelectField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options, key: key);
 
   @override
   _SelectFieldState createState() {
@@ -41,6 +43,7 @@ class SelectField extends Field {
 
   @override
   bool canGoBack() {
+    var bottomSheetController = key.currentState.bottomSheetController;
     if (bottomSheetController != null) {
       bottomSheetController.close();
       bottomSheetController = null;
@@ -64,6 +67,7 @@ class SelectField extends Field {
 
 class _SelectFieldState extends State<SelectField> {
   String _value;
+  PersistentBottomSheetController bottomSheetController;
   Function _onChanged;
 
   /// Will display the fullscreen list view to choose from the
@@ -88,11 +92,14 @@ class _SelectFieldState extends State<SelectField> {
       );
     }
 
-    widget.bottomSheetController = showBottomSheet(
+    bottomSheetController = showBottomSheet(
         context: context,
         builder: (context) {
           return SearchableList(tiles: widgets);
         });
+    bottomSheetController.closed.then((value) {
+      bottomSheetController = null;
+    });
   }
 
   @override

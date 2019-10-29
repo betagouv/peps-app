@@ -105,5 +105,5 @@ abstract class Field extends StatefulWidget with ChangeNotifier {
     return true;
   }
 
-  Field({this.fieldKey, this.schema, this.options});
+  Field({this.fieldKey, this.schema, this.options, Key key}) : super(key: key);
 }

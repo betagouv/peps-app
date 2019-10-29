@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:app/form/fields/base_field.dart';
 import 'package:app/searchable_list.dart';
 
+/// This key will allow us to access the state
+final key = new GlobalKey<_ArrayFieldState>();
+
 /// The array field allows choosing an ordered list of
 /// elements from options (implements Alpaca's array field
 /// http://www.alpacajs.org/docs/fields/array.html).
 class ArrayField extends Field {
   List<String> selected;
-  PersistentBottomSheetController bottomSheetController;
 
-  ArrayField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options);
+  ArrayField({String fieldKey, Map schema, Map options}) : super(fieldKey: fieldKey, schema: schema, options: options, key: key);
 
   @override
   _ArrayFieldState createState() {
@@ -53,9 +55,9 @@ class ArrayField extends Field {
 
   @override
   bool canGoBack() {
+    var bottomSheetController = key.currentState.bottomSheetController;
     if (bottomSheetController != null) {
       bottomSheetController.close();
-      bottomSheetController = null;
       return false;
     }
     return super.canGoBack();
@@ -78,6 +80,7 @@ class ArrayField extends Field {
 
 class _ArrayFieldState extends State<ArrayField> {
   List<Map> _selected = List<Map>();
+  PersistentBottomSheetController bottomSheetController;
   Function _onChanged;
 
   /// Allows is to swap places in the state array to move
@@ -138,11 +141,14 @@ class _ArrayFieldState extends State<ArrayField> {
       );
     }
 
-    widget.bottomSheetController = showBottomSheet(
+    bottomSheetController = showBottomSheet(
         context: context,
         builder: (context) {
           return SearchableList(tiles: widgets);
         });
+    bottomSheetController.closed.then((value) {
+      bottomSheetController = null;
+    });
   }
 
   @override
