@@ -64,6 +64,20 @@ class _LandingViewState extends State<LandingView> {
       children: <Widget>[
         _getHeader(context),
         _getList(context),
+        Expanded(
+          child: Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 15),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Image.asset(
+                    'assets/logo-beta.gouv.fr.png',
+                    height: 25,
+                  ),
+                ),
+              )),
+        ),
       ],
     );
   }
