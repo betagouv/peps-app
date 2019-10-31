@@ -65,6 +65,14 @@ flutter:
    - .env
    - assets/bg-image.png
    - assets/logo-beta.gouv.fr.png
+   - assets/ecophyto.png
+   - assets/inra.jpg
+   - assets/ministere_agriculture.png
+   - assets/ministere_ecologie.jpg
+   - assets/alex.png
+   - assets/maud.png
+   - assets/ben.jpeg
+   - assets/mathilde.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -24,11 +24,11 @@ class About extends StatelessWidget {
         style: bodyStyle,
       ),
       Text(
-        "Le dispositif Startup d’Etat vise à utiliser les principes de fonctionnement des Startups pour répondre à un problème lié à une politique publique. Le service est ainsi co-conçu à partir d'atelier avec les acteurs du terrain. Une première version, même imparfaite, est lancée rapidement et améliorée par la suite avec le retours des agriculteurs et des acteurs du monde agricole. Au lieu de sortir dans 5 ans un produit a priori parfait mais jamais confronté au terrain, une Startup d'Etat lance un service public petit qu'elle fait grandir au fur et à mesure avec ses utilisateurs. L'objectif est de construire avec le terrain un service utile et utilisé.",
+        "Le dispositif Startup d’Etat vise à utiliser les principes de fonctionnement des Startups pour répondre à un problème lié à une politique publique. Le service est ainsi co-conçu à partir d'atelier avec les acteurs du terrain. L'objectif est de construire avec le terrain un service utile et utilisé.",
         style: bodyStyle,
       ),
       Text(
-        "Une Start up d'Etat est un service public, elle est portée par une ou plusieurs administrations référentes. Peps est ainsi créé dans le cadre du plan Ecophyto. L'équipe de la Startup est cependant autonome dans les actions qu'elle mène et dans sa gestion du projet. Elle doit seulement rendre compte de son impact tous les 6 mois à son administration de référence. Ainsi, les données que vous partagez avec Peps resteront confidentielles.",
+        "Une Start up d'Etat est un service public, elle est portée par une ou plusieurs administrations référentes. Peps est ainsi créé dans le cadre du plan Ecophyto.",
         style: bodyStyle,
       ),
       Text(
@@ -40,7 +40,7 @@ class About extends StatelessWidget {
         style: bodyStyle,
       ),
       Text(
-        "Pour se faire, nous prenons contact avec toutes les personnes qui œuvrent sur le sujet et nous allons autant que possible au contact du terrain pour les rencontrer. Ainsi, Peps a organisé des journées de travail avec l'ensemble du monde agricole : agriculteurs, syndicats, DRAAF, DDT, Chambres d'agricultures, coopératives, association environnementale, CUMA. L'équipe Peps suit aussi des conseillers de coopératives et des agriculteurs dans leur journée de travail.",
+        "Pour se faire, nous prenons contact avec toutes les personnes qui œuvrent sur le sujet et nous allons autant que possible au contact du terrain pour les rencontrer. Ainsi, Peps a organisé des journées de travail avec l'ensemble du monde agricole : agriculteurs, syndicats, DRAAF, DDT, chambres d'agricultures, coopératives, associations environnementales, CUMA, et autres.",
         style: bodyStyle,
       ),
       Text(
@@ -48,16 +48,56 @@ class About extends StatelessWidget {
         style: bodyStyle,
       ),
       Text(
-        "Nous nous focalisons sur l’impact",
+        "L'équipe",
         style: titleStyle,
       ),
-      Text(
-        "Peps ne sera pas un nouveau portail compilant autrement la documentation technique par ailleurs déjà diffusée par des sites développés depuis plusieurs années. Peps adopte un positionnement inexploité : l'orientation des agriculteurs dans leur transition. Peps oriente vers de pratiques éprouvées puis vers les organismes pouvant accompagner l'agriculteur en local.",
-        style: bodyStyle,
+      _TeamMember(
+        image: AssetImage('assets/maud.png'),
+        title: "Maud Blanck",
+        subtitle: "Experte métier",
+      ),
+      _TeamMember(
+        image: AssetImage('assets/mathilde.png'),
+        title: "Mathilde Petit",
+        subtitle: "Cheffe de produit informatique",
+      ),
+      _TeamMember(
+        image: AssetImage('assets/ben.jpeg'),
+        title: "Benjamin Doberset",
+        subtitle: "Chargé de déploiement",
+      ),
+      _TeamMember(
+        image: AssetImage('assets/alex.png'),
+        title: "Alejandro M Guillén",
+        subtitle: "CTO / Développement logiciel",
       ),
       Text(
-        "Nous avons 6 mois, c'est à dire jusqu'à mi-novembre, pour faire une preuve d'impact du service que nous développons. Cet impact est un témoignage que l'outil a apporté un service réel à l'agriculteur. Par exemple, l'agricuteur à engager une action qu’il n’aurait pas mis en œuvre sans.",
-        style: bodyStyle,
+        "Nos administrations référentes",
+        style: titleStyle,
+      ),
+      Row(
+        children: <Widget>[
+          Flexible(
+              child: Image.asset(
+            'assets/ministere_agriculture.png',
+            width: MediaQuery.of(context).size.width / 2,
+          )),
+          Flexible(child: Image.asset('assets/ministere_ecologie.jpg', width: MediaQuery.of(context).size.width / 2)),
+        ],
+      ),
+      Row(
+        children: <Widget>[
+          Flexible(
+              child: Image.asset(
+            'assets/ecophyto.png',
+            width: MediaQuery.of(context).size.width / 2,
+          )),
+          Flexible(
+              child: Image.asset(
+            'assets/inra.jpg',
+            width: MediaQuery.of(context).size.width / 2,
+          )),
+        ],
       ),
     ];
 
@@ -65,7 +105,7 @@ class About extends StatelessWidget {
       key: Key('try_practice'),
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Mise en place'),
+        title: Text('Qui sommes-nous ?'),
       ),
       body: ListView.separated(
         padding: EdgeInsets.all(15.0),
@@ -80,5 +120,47 @@ class About extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _TeamMember extends StatelessWidget {
+  final ImageProvider image;
+  final String title;
+  final String subtitle;
+
+  _TeamMember({this.image, this.title, this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: <Widget>[
+      Container(
+        width: 70.0,
+        height: 70.0,
+        decoration: new BoxDecoration(
+          shape: BoxShape.circle,
+          image: new DecorationImage(
+            fit: BoxFit.fill,
+            image: this.image,
+          ),
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.all(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              title,
+              style: TextStyle(fontSize: 18, height: 1.3),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(color: Colors.grey, height: 1.3),
+            ),
+          ],
+        ),
+      ),
+    ]);
   }
 }
