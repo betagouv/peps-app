@@ -1,30 +1,23 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:app/try_contact_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:app/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    // await tester.pumpWidget(MyApp());
 
-    // // Verify that our counter starts at 0.
-    // expect(find.text('0'), findsOneWidget);
-    // expect(find.text('1'), findsNothing);
+  testWidgets('Contact widget displays title', (WidgetTester tester) async {
 
-    // // Tap the '+' icon and trigger a frame.
-    // await tester.tap(find.byIcon(Icons.add));
-    // await tester.pump();
+    final TryContactDialog contactDialog = TryContactDialog(
+      title: 'Test title',
+      body: 'Test body',
+      answers: [{'Test question': 'Test answer'}],
+      practiceId: 'Test practice ID',
+    );
+    await tester.pumpWidget(MaterialApp(
+      title: 'Test Material app',
+      home: contactDialog,
+    ));
 
-    // // Verify that our counter has incremented.
-    // expect(find.text('0'), findsNothing);
-    // expect(find.text('1'), findsOneWidget);
+    expect(find.text('Test title'), findsOneWidget);
+    expect(find.text('Test body'), findsOneWidget);
   });
 }

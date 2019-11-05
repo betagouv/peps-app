@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app/resources/api_provider.dart';
 import 'package:app/utils/phone_formatter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:http/http.dart' as http;
@@ -214,6 +215,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     var phoneNumber = phoneTextController.text;
     var email = emailTextController.text;
     var answers = widget.answers == null ? {} : widget.answers;
+    var reason = 'Donner du feedback';
 
     var _answers = '';
 
@@ -226,23 +228,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     prefs.setString('email', email);
 
     try {
-      var response = await http.post(
-        new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/sendTask'),
-        body: jsonEncode({
-          'answers': _answers,
-          'email': email,
-          'name': name,
-          'phone_number': phoneNumber,
-          'reason': 'Donner du feedback',
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Api-Key ' + DotEnv().env['API_KEY'],
-        },
-      ).timeout(const Duration(seconds: 10), onTimeout: () {
-        return http.Response('', 408);
-      });
-
+      var response = await ApiProvider().sendTask(answers: _answers, email: email, name: name, phone: phoneNumber, reason: reason);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         showDialog(
           context: context,

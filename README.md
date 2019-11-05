@@ -29,3 +29,36 @@ In order to setup Firebase (Crashlytics and Analytics), make sure you have downl
 A problem was found with the configuration of task ':app:processDebugGoogleServices'.
 > File './android/app/google-services.json' specified for property 'quickstartFile' does not exist.
 ```
+
+## Widget testing
+
+Widget test files are found in the ```test``` directory. To run widget tests, type in the console:
+
+```
+fluter test test
+```
+
+You should see an output that ends with:
+
+```
+...
+00:02 +1: All tests passed!
+```
+
+Alternatively, if you are using VSCode, there is a ```launch.json``` entry that allows you to run the tests directly from the editor's debug tab ("Test Widget"). This will allow you to breakpoint in the code.
+
+## Integration testing
+
+Integration test files are found in the ```test_driver``` directory. To run integration tests, type in the console:
+
+```
+flutter drive --target=test_driver/app.dart
+```
+
+You should see an output that ends with:
+
+```
+...
+00:02 +4: All tests passed!
+Stopping application instance.
+```

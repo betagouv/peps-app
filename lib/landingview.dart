@@ -114,6 +114,7 @@ class _LandingViewState extends State<LandingView> {
 
   Widget _getMainButton(BuildContext context) {
     return RaisedButton(
+      key: Key('landing_form_button'),
       color: Colors.white,
       child: Padding(
         padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -156,6 +157,7 @@ class _LandingViewState extends State<LandingView> {
     return Column(
       children: <Widget>[
         Card(
+          key: Key('about_us_button'),
           child: ListTile(
             leading: Padding(
               child: Icon(Icons.filter_vintage),
@@ -179,6 +181,7 @@ class _LandingViewState extends State<LandingView> {
           ),
         ),
         Card(
+          key: Key('contact_us_button'),
           child: ListTile(
             leading: Padding(
               child: Icon(Icons.email),

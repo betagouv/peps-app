@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app/feedback_dialog.dart';
+import 'package:app/resources/api_provider.dart';
 import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -109,18 +110,7 @@ class _SuggestionsState extends State<Suggestions> {
   }
 
   void _assignFuture() {
-    _loadSuggestions = http.post(
-      new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/calculateRankings'),
-      body: jsonEncode({
-        'answers': widget.formResults,
-        'practice_blacklist': this.practiceBlacklist,
-        'type_blacklist': this.typeBlacklist,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Api-Key ' + DotEnv().env['API_KEY'],
-      },
-    );
+    _loadSuggestions = ApiProvider().calculateRankings(widget.formResults, this.practiceBlacklist, this.typeBlacklist);
   }
 
   void showContactDialog(BuildContext context) async {

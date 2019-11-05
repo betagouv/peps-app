@@ -1,20 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app/resources/api_provider.dart';
 import 'package:app/utils/connectionerrorwidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'package:app/utils/mock_peps_server.dart';
 import 'package:app/landingview.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
-Future main() async {
+Future main({bool test:false}) async {
   await DotEnv().load();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  if(test) {
+    print('Running Peps app in testing mode');
+    ApiProvider().client = MockPepsServer();
+  } else {
+    FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  }
   Crashlytics.instance.enableInDevMode = false;
-  FlutterError.onError = Crashlytics.instance.recordFlutterError;
   runApp(MyApp());
 }
 
@@ -40,6 +46,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Peps',
       navigatorObservers: <NavigatorObserver>[observer],
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: primarySwatch,
         primaryColor: primarySwatch.shade500,
@@ -115,7 +122,6 @@ class _PepsHomePageState extends State<PepsHomePage> {
   }
 
   void _assignFuture() {
-    _loadForm =
-        http.get(new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/formSchema'), headers: {'Authorization': 'Api-Key ' + DotEnv().env['API_KEY']});
+    _loadForm = ApiProvider().fetchFormSchema();
   }
 }

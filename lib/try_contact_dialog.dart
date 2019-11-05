@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'package:app/resources/api_provider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +6,6 @@ import 'package:app/utils/phone_formatter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,34 +21,16 @@ class TryContactDialog extends StatefulWidget {
       : assert(title != null),
         assert(body != null),
         assert(answers != null),
-        assert(practiceId != null),
-        assert(analytics != null),
-        assert(observer != null);
+        assert(practiceId != null);
 
   Future createTask(String name, String phoneNumber, String datetime) async {
-
     var _answers = '';
 
     for (var item in answers) {
       _answers += (item['title'] + '\n' + item['answer'] + '\n\n');
     }
 
-    return await http.post(
-      new Uri.http(DotEnv().env['BACKEND_URL'], '/api/v1/sendTask'),
-      body: jsonEncode({
-        'answers': _answers,
-        'email': '',
-        'name': name,
-        'phone_number': phoneNumber,
-        'datetime': datetime,
-        'practice_id': practiceId,
-        'problem': title,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Api-Key ' + DotEnv().env['API_KEY'],
-      },
-    );
+    return await ApiProvider().sendTask(answers: _answers, name: name, phone: phoneNumber, datetime: datetime, practiceId: practiceId, reason: title);
   }
 
   @override
@@ -94,7 +75,6 @@ class _TryContactDialogState extends State<TryContactDialog> {
     var now = DateTime.now();
     selectedDate = DateTime(now.year, now.month, now.day, timeFrames[0].value);
     loading = false;
-
   }
 
   populateUserInfo() async {
@@ -120,10 +100,10 @@ class _TryContactDialogState extends State<TryContactDialog> {
     }
 
     if (phoneFocusNode.hasFocus) {
-      phoneTextController.selection = TextSelection(baseOffset:0, extentOffset:phoneTextController.text.length);
+      phoneTextController.selection = TextSelection(baseOffset: 0, extentOffset: phoneTextController.text.length);
     }
     if (nameFocusNode.hasFocus) {
-      nameTextController.selection = TextSelection(baseOffset:0, extentOffset:nameTextController.text.length);
+      nameTextController.selection = TextSelection(baseOffset: 0, extentOffset: nameTextController.text.length);
     }
 
     TextField nameTextField = TextField(
@@ -316,13 +296,14 @@ class _TryContactDialogState extends State<TryContactDialog> {
   }
 
   Widget _getSuccessBuilder(BuildContext context) {
-
-    widget.analytics.logEvent(
-      name: 'contact_request_sent',
-      parameters: <String, dynamic>{
-        'title': title,
-      },
-    );
+    if (widget.analytics != null) {
+      widget.analytics.logEvent(
+        name: 'contact_request_sent',
+        parameters: <String, dynamic>{
+          'title': title,
+        },
+      );
+    }
 
     return AlertDialog(
       title: Text('👍 C\'est noté'),
@@ -341,13 +322,14 @@ class _TryContactDialogState extends State<TryContactDialog> {
   }
 
   Widget _getFailBuilder(BuildContext context, http.Response response) {
-
-    widget.analytics.logEvent(
-      name: 'contact_request_failed',
-      parameters: <String, dynamic>{
-        'title': title,
-      },
-    );
+    if (widget.analytics != null) {
+      widget.analytics.logEvent(
+        name: 'contact_request_failed',
+        parameters: <String, dynamic>{
+          'title': title,
+        },
+      );
+    }
 
     return AlertDialog(
       title: Text('🙁 Oops !'),
