@@ -119,7 +119,7 @@ class _LandingViewState extends State<LandingView> {
       child: Padding(
         padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Text(
-          'Améliorer mon système',
+          'Démarrer',
           style: TextStyle(
             color: Theme.of(context).accentColor,
             fontSize: 18,
@@ -133,7 +133,7 @@ class _LandingViewState extends State<LandingView> {
   Widget _getMainText(BuildContext context) {
     return Padding(
       child: Text(
-        'Trouvez des pratiques alternatives personalisées',
+        'Une sélection de pratiques alternatives adaptées à votre situation',
         style: TextStyle(
           color: Colors.white,
           shadows: <Shadow>[

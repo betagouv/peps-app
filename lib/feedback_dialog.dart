@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:app/resources/api_provider.dart';
 import 'package:app/utils/phone_formatter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -215,7 +211,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     var phoneNumber = phoneTextController.text;
     var email = emailTextController.text;
     var answers = widget.answers == null ? {} : widget.answers;
-    var reason = 'Donner du feedback';
+    var reason = 'Donner du feedback (utilisation depuis l\'app)';
 
     var _answers = '';
 
