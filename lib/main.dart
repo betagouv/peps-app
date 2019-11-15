@@ -106,8 +106,8 @@ class _PepsHomePageState extends State<PepsHomePage> {
             }
 
             final jsonBody = jsonDecode(snapshot.data.body);
-            final jsonProperties = jsonBody['schema']['properties'];
-            final jsonOptions = jsonBody['options']['fields'];
+            final jsonProperties = jsonBody['practices_form']['schema']['properties'];
+            final jsonOptions = jsonBody['practices_form']['options']['fields'];
 
             return LandingView(
               jsonProperties: jsonProperties,

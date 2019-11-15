@@ -347,7 +347,7 @@ class ButtonRow extends StatelessWidget {
 
   void _blacklistPractice(BuildContext context) {
     List<Widget> widgets = List<Widget>();
-    widgets.add(_createDialogOption('J’ai déjà prévu de mettre en place cette pratique', Icons.visibility_off, ()=> hidePractice('J’ai déjà prévu de mettre en place cette pratique')));
+    widgets.add(_createDialogOption('J\'ai déjà prévu de mettre en place cette pratique', Icons.visibility_off, ()=> hidePractice('J\'ai déjà prévu de mettre en place cette pratique')));
     widgets.add(_createDialogOption('Cette pratique a été testée ou est en place sur mon exploitation', Icons.visibility_off, ()=> hidePractice('Cette pratique a été testée ou est en place sur mon exploitation')));
     widgets.add(_createDialogOption('Cette pratique n’est pas applicable pour mon exploitation', Icons.visibility_off, ()=> hidePractice('Cette pratique n’est pas applicable pour mon exploitation')));
     widgets.add(_createDialogOption('Autre', Icons.visibility_off, ()=> hidePractice('Autre')));

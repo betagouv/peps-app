@@ -77,7 +77,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
     return SimpleDialog(
       title: Text('🎙️ Votre avis nous intéresse'),
-      children: canContact ? getContactWidgets(context) : getAuthorizationWidgets(context),
+      children: getContactWidgets(context),
     );
   }
 
@@ -176,7 +176,12 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
           padding: EdgeInsets.fromLTRB(20, 5, 20, 0),
           child: Column(
             children: <Widget>[
-              Text('Merci ! Veuillez remplir les champs ci-desous et nous reviendrons vers vous.'),
+              Text(
+                "Peps est en étape d'expérimentation. Afin d'améliorer le service, Notre équipe pourrait éventuellement être amenée à vous contacter pour avoir votre avis et discuter davantage des pratiques adaptées pour votre situation.",
+                style: TextStyle(
+                  height: 1.3,
+                ),
+              ),
               Padding(
                 child: nameTextField,
                 padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
