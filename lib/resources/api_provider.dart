@@ -65,4 +65,19 @@ class ApiProvider {
       return Response('', 408);
     });
   }
+
+  Future<Response> createDiscardAction(String practiceId, String reason) {
+    return client
+        .post(
+      new Uri.http(rootUrl, '/api/v1/discardAction'),
+      body: jsonEncode({
+        'practice_airtable_id': practiceId,
+        'reason': reason,
+      }),
+      headers: {}..addAll(authHeaders)..addAll(jsonHeaders),
+    )
+        .timeout(defaultTimeout, onTimeout: () {
+      return Response('', 408);
+    });
+  }
 }

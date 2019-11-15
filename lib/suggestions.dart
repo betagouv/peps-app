@@ -71,14 +71,18 @@ class _SuggestionsState extends State<Suggestions> {
 
     for (var suggestion in suggestions) {
       var blacklistedPracticeId = suggestion['practice']['id'].toString();
+      var practiceAirtableId = suggestion['practice']['external_id'].toString();
 
-      Function hidePractice = () {
+      Function hidePractice = (String reason) {
         analytics.logEvent(
           name: 'hide_practice',
           parameters: <String, dynamic>{
             'practice': blacklistedPracticeId,
+            'reason': reason,
           },
         );
+
+        ApiProvider().createDiscardAction(practiceAirtableId, reason);
 
         setState(() {
           List<String> newBlacklist = [blacklistedPracticeId];

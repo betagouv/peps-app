@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class SuggestionCard extends StatelessWidget {
   final Map json;
   final List<Map<String, String>> answers;
-  final void Function() hidePractice;
+  final void Function(String reason) hidePractice;
   final void Function(String typeId) hidePracticeType;
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
@@ -306,7 +306,7 @@ class ResourceLink extends StatelessWidget {
 /// card.
 class ButtonRow extends StatelessWidget {
   final double iconSize = 35.0;
-  final void Function() hidePractice;
+  final void Function(String reason) hidePractice;
   final void Function(String typeId) hidePracticeType;
   final void Function(BuildContext context) tryPractice;
   final List<Map> practiceTypes;
@@ -347,17 +347,11 @@ class ButtonRow extends StatelessWidget {
 
   void _blacklistPractice(BuildContext context) {
     List<Widget> widgets = List<Widget>();
-    widgets.add(_createDialogOption('Recalculer sans cette pratique', Icons.visibility_off, hidePractice));
+    widgets.add(_createDialogOption('J’ai déjà prévu de mettre en place cette pratique', Icons.visibility_off, ()=> hidePractice('J’ai déjà prévu de mettre en place cette pratique')));
+    widgets.add(_createDialogOption('Cette pratique a été testée ou est en place sur mon exploitation', Icons.visibility_off, ()=> hidePractice('Cette pratique a été testée ou est en place sur mon exploitation')));
+    widgets.add(_createDialogOption('Cette pratique n’est pas applicable pour mon exploitation', Icons.visibility_off, ()=> hidePractice('Cette pratique n’est pas applicable pour mon exploitation')));
+    widgets.add(_createDialogOption('Autre', Icons.visibility_off, ()=> hidePractice('Autre')));
 
-    for (var practiceType in practiceTypes) {
-      widgets.add(
-        _createDialogOption(
-          'Recalculer sans aucune pratique du type "${practiceType['display_text'].toString().toLowerCase()}"',
-          Icons.visibility_off,
-          () => hidePracticeType(practiceType['id'].toString()),
-        ),
-      );
-    }
     widgets.add(_createDialogOption('Annuler', Icons.keyboard_backspace, () => Navigator.pop(context)));
 
     showDialog(
