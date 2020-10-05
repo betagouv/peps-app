@@ -1,4 +1,6 @@
-# Peps mobile app
+# Ce repo n'est plus maintenu. Le code de la startup Peps se trouve sur  https://github.com/betagouv/peps
+
+## Peps mobile app
 
 Frontend mobile application for peps based on Flutter.
 
